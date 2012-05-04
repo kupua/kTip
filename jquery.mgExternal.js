@@ -1,5 +1,5 @@
 /**
- * mgExternal 1.0.25
+ * mgExternal 1.0.26
  *
  * Copyright 2012 Ricard Osorio Mañanas
  * Dual licensed under the MIT or GPL Version 2 licenses.
@@ -116,6 +116,7 @@ window.mgExternal = function(trigger, defaultContent, options) {
 		onClose:          function(){},
 		onDestroy:        function(){},
 		onContentReady:   function(){},
+		onLoading:        function(){},
 		onJsonData:       function(data){}
 	};
 
@@ -137,6 +138,7 @@ window.mgExternal = function(trigger, defaultContent, options) {
 	this._triggerZIndexBackup = null;
 	this._preventNextMouseUp = false;
 	this._moveTooltipTimeout = null;
+	this._currentAjaxRequest = null;
 
 	// Set trigger bindings
 	if (this.$trigger) {
@@ -456,7 +458,7 @@ mgExternal.prototype = {
 		this.$content.find('[class*="mgExternal-redirect"]').bind('click', function(e){
 			var $elem = $(this);
 
-			$elem.addClass(self.settings.loadingClass);
+			$elem.addClass(self.settings.loadingClass); // Why repeat? Already used in loadAjaxContent
 
 			var modalContentChangeAnimation = {};
 
@@ -486,10 +488,16 @@ mgExternal.prototype = {
 
 	loadAjaxContent: function(submit, modalContentChangeAnimation) {
 
+		if (this._currentAjaxRequest) {
+			this._currentAjaxRequest.abort();
+			this._currentAjaxRequest = null;
+		}
+
 		var self = this,
 			ajaxData = $.extend({}, self.settings.ajaxData);
 
 		this.$trigger.addClass(this.settings.loadingClass);
+		this.settings.onLoading.call(this);
 
 		if (submit) {
 			this._lastSubmitName = submit.find(this.settings.submitIdentifier).val();
@@ -546,11 +554,12 @@ mgExternal.prototype = {
 				  .unbind('submit')
 				  .trigger('submit');
 		} else {
-			$.ajax({
+			this._currentAjaxRequest = $.ajax({
 				url: this.settings.ajaxUrl || this.$trigger.attr('href'),
 				type: submit ? 'POST' : 'GET',
 				data: ajaxData,
 				success: function(data){
+					self._currentAjaxRequest = null;
 					self.$trigger.removeClass(self.settings.loadingClass);
 
 					if (typeof data == 'object') {
@@ -560,9 +569,12 @@ mgExternal.prototype = {
 					}
 				},
 				error: function(jqXHR, textStatus, errorThrown){
-					self.$trigger.removeClass(self.settings.loadingClass);
+					self._currentAjaxRequest = null;
 
-					self.setContent('<div class="notice alert">S\'ha produït un error</div>', modalContentChangeAnimation);
+					if (textStatus !== 'abort') {
+						self.$trigger.removeClass(self.settings.loadingClass);
+						self.setContent('<div class="notice alert">S\'ha produït un error</div>', modalContentChangeAnimation);
+					}
 				}
 			});
 		}
