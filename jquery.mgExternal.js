@@ -117,6 +117,7 @@ window.mgExternal = function(trigger, defaultContent, options) {
 		onDestroy:        function(){},
 		onContentReady:   function(){},
 		onLoading:        function(){},
+		onFinishLoading:  function(){},
 		onJsonData:       function(data){}
 	};
 
@@ -274,6 +275,7 @@ mgExternal.prototype = {
 		var self = this;
 
 		this.$trigger.removeClass(this.settings.loadingClass).removeClass(this.settings.activeClass);
+		this.settings.onFinishLoading.call(this);
 
 		// Fade container out
 		this.$container.fadeOut(this.settings.hideSpeed, function(){
@@ -524,6 +526,7 @@ mgExternal.prototype = {
 				.appendTo('body')
 				.bind('load', function(){
 					self.$trigger.removeClass(self.settings.loadingClass);
+					self.settings.onFinishLoading.call(self);
 
 					var response = $(this).contents().find('body').html();
 					// Is it a JSON object?
@@ -561,6 +564,7 @@ mgExternal.prototype = {
 				success: function(data){
 					self._currentAjaxRequest = null;
 					self.$trigger.removeClass(self.settings.loadingClass);
+					self.settings.onFinishLoading.call(self);
 
 					if (typeof data == 'object') {
 						self.settings.onJsonData.call(self, data);
@@ -573,6 +577,7 @@ mgExternal.prototype = {
 
 					if (textStatus !== 'abort') {
 						self.$trigger.removeClass(self.settings.loadingClass);
+						self.settings.onFinishLoading.call(self);
 						self.setContent('<div class="notice alert">S\'ha produït un error</div>', modalContentChangeAnimation);
 					}
 				}
