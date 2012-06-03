@@ -1,5 +1,5 @@
 /**
- * mgExternal 1.0.26
+ * mgExternal 1.0.27
  *
  * Copyright 2012 Ricard Osorio Mañanas
  * Dual licensed under the MIT or GPL Version 2 licenses.
@@ -247,7 +247,12 @@
 
 				var url = this.settings.ajaxUrl || this.$trigger.attr('href');
 
-				if (this._defaultContent) {
+				if (url && this._defaultContent && this._defaultContent.indexOf('mgExternal-preloader') >= 0) {
+					this.setContent(this._defaultContent);
+					setTimeout(function(){
+						self.$content.find('.mgExternal-preloader').attr('href', url).trigger('click');
+					}, this.settings.showSpeed);
+				} else if (this._defaultContent) {
 					this.setContent(this._defaultContent);
 				} else if (url.match(/\.(jpg|gif|png|bmp|jpeg)(.*)?$/i)) {
 					this.setContent('<img src="'+url+'" style="display:block;" />');
@@ -274,6 +279,7 @@
 
 			var self = this;
 
+			this.abortCurrentAjaxRequest();
 			this.$trigger.removeClass(this.settings.loadingClass).removeClass(this.settings.activeClass);
 			this.settings.onFinishLoading.call(this);
 
@@ -318,11 +324,13 @@
 
 			if (this.settings.display == 'modal') {
 				modalContentChangeAnimation = modalContentChangeAnimation || {type: 'resize'};
+				modalContentChangeAnimation.$preContent = this.$content.clone(false);
 				modalContentChangeAnimation.preHeight = this.$content.height();
 				modalContentChangeAnimation.preWidth = this.$content.width();
 			}
 
-			this.$content.clone().appendTo(this.$container);
+			var $dummyContent = this.$content.clone().appendTo(this.$container);
+
 			this.$content
 				.html(html)
 				.css({
@@ -352,7 +360,7 @@
 			this.settings.onContentReady.call(this);
 
 			var proceed = function() {
-				self.$container.find('.mgExternal-content').remove();
+				$dummyContent.remove();
 				self.$content.css({
 					left: '',
 					top: '',
@@ -368,7 +376,9 @@
 				}
 			}
 
-			var $images = this.$content.find('img');
+			proceed();
+
+			/*var $images = this.$content.find('img');
 
 			if ($images.length) {
 				var loadedImages = 0;
@@ -378,7 +388,7 @@
 				});
 			} else {
 				proceed();
-			}
+			}*/
 		},
 
 		showContainer: function() {
@@ -467,7 +477,6 @@
 				if (self.settings.display == 'modal') {
 					if ($elem.is('[class*="redirect-fade"]')) {
 						modalContentChangeAnimation.type = 'fade';
-						self.$container.fadeOut();
 					} else if ($elem.is('[class*="redirect-move"]')) {
 						modalContentChangeAnimation.type = 'move';
 					} else if ($elem.is('[class*="redirect-instant"]')) {
@@ -488,12 +497,16 @@
 			});
 		},
 
-		loadAjaxContent: function(submit, modalContentChangeAnimation) {
-
+		abortCurrentAjaxRequest: function() {
 			if (this._currentAjaxRequest) {
 				this._currentAjaxRequest.abort();
 				this._currentAjaxRequest = null;
 			}
+		},
+
+		loadAjaxContent: function(submit, modalContentChangeAnimation) {
+
+			this.abortCurrentAjaxRequest();
 
 			var self = this,
 				ajaxData = $.extend({}, self.settings.ajaxData);
@@ -803,12 +816,19 @@
 			switch (modalContentChangeAnimation.type) {
 
 				case 'fade':
-					this.$container.stop().css({
-						top: top,
-						left: left
-					}).animate({
-						opacity: 1
-					}, this.settings.modal.animateSpeed);
+					this.$content.hide();
+					this.$container
+						.append(modalContentChangeAnimation.$preContent)
+						.fadeOut(this.settings.modal.animateSpeed, function(){
+							modalContentChangeAnimation.$preContent.remove();
+							self.$content.show();
+							self.$container.css({
+								top: top,
+								left: left
+							}).fadeIn(self.settings.modal.animateSpeed, function(){
+								self.setFocus();
+							});
+						});
 					break;
 
 				case 'move':
