@@ -21,6 +21,7 @@ body { overflow-y: scroll; }
 	   -moz-box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 	        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 	overflow: auto;
+	position: relative;
 }
 
 /* Style: default tooltip */

@@ -115,8 +115,8 @@
 			onClose:          function(){},
 			onDestroy:        function(){},
 			onContentReady:   function(){},
-			onLoading:        function(){},
-			onFinishLoading:  function(){},
+			onStartLoading:   function(){},
+			onStopLoading:    function(){},
 			onJsonData:       function(data){}
 		};
 
@@ -280,7 +280,7 @@
 
 			this.abortCurrentAjaxRequest();
 			this.$trigger.removeClass(this.settings.loadingClass).removeClass(this.settings.activeClass);
-			this.settings.onFinishLoading.call(this);
+			this.settings.onStopLoading.call(this);
 
 			// Fade container out
 			this.$container.fadeOut(this.settings.hideSpeed, function(){
@@ -511,7 +511,7 @@
 				ajaxData = $.extend({}, self.settings.ajaxData);
 
 			this.$trigger.addClass(this.settings.loadingClass);
-			this.settings.onLoading.call(this);
+			this.settings.onStartLoading.call(this);
 
 			if (submit) {
 				this._lastSubmitName = submit.find(this.settings.submitIdentifier).val();
@@ -538,7 +538,7 @@
 					.appendTo('body')
 					.bind('load', function(){
 						self.$trigger.removeClass(self.settings.loadingClass);
-						self.settings.onFinishLoading.call(self);
+						self.settings.onStopLoading.call(self);
 
 						var response = $(this).contents().find('body').html();
 						// Is it a JSON object?
@@ -576,7 +576,7 @@
 					success: function(data){
 						self._currentAjaxRequest = null;
 						self.$trigger.removeClass(self.settings.loadingClass);
-						self.settings.onFinishLoading.call(self);
+						self.settings.onStopLoading.call(self);
 
 						if (typeof data == 'object') {
 							self.settings.onJsonData.call(self, data);
@@ -589,7 +589,7 @@
 
 						if (textStatus !== 'abort') {
 							self.$trigger.removeClass(self.settings.loadingClass);
-							self.settings.onFinishLoading.call(self);
+							self.settings.onStopLoading.call(self);
 							self.setContent('<div class="notice alert">S\'ha produït un error</div>', modalContentChangeAnimation);
 						}
 					}
