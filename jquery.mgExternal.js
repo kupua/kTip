@@ -103,8 +103,7 @@
 				distance: 0,
 				arrowSize: 8, // Arrow size in pixels
 				arrowDistance: 15,
-				arrowFrontColor: null, // Default front color is set in the CSS file,
-				arrowBorderColor: null, // Default border color is set in the CSS file
+				arrowFrontColor: null,
 				fit: true
 			},
 
@@ -739,7 +738,6 @@
 					.append($('<div/>')
 						.addClass('mgExternal-arrow-shadow')
 						.css({
-							borderColor: this.settings.tooltip.arrowBorderColor,
 							borderStyle: 'solid',
 							borderWidth: this.settings.tooltip.arrowSize
 						})
@@ -747,10 +745,10 @@
 					.append($('<div/>')
 						.addClass('mgExternal-arrow-front')
 						.css({
-							borderColor: this.settings.tooltip.arrowFrontColor || this.$content.css('backgroundColor'),
+							borderColor: this.settings.tooltip.arrowFrontColor || this.$content.css('background-color'),
 							borderStyle: 'solid',
-							position: 'absolute',
-							borderWidth: this.settings.tooltip.arrowSize
+							borderWidth: this.settings.tooltip.arrowSize,
+							position: 'absolute'
 						}
 					));
 			}
@@ -1080,7 +1078,8 @@
 						}).filter('.mgExternal-arrow-front').css({
 							left: 0,
 							top: (position == 'top' ? '-' : '')+this.$content.css('borderBottomWidth')
-						});
+						}).end().filter('.mgExternal-arrow-shadow')
+							.css('border-'+position+'-color', this.$content.css('border-'+(position == 'top' ? 'bottom' : 'top')+'-color'));
 					} else {
 						this.$tooltipArrow.css({
 							bottom: '',
@@ -1099,7 +1098,8 @@
 						}).filter('.mgExternal-arrow-front').css({
 							left: (position == 'left' ? '-' : '')+this.$content.css('borderBottomWidth'),
 							top: 0
-						});
+						}).end().filter('.mgExternal-arrow-shadow')
+							.css('border-'+position+'-color', this.$content.css('border-'+(position == 'left' ? 'right' : 'left')+'-color'));
 					}
 				} else if (this.$tooltipArrow) {
 					this.$tooltipArrow.hide();
