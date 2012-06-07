@@ -26,7 +26,7 @@
 
 //---[ mgExternal constructor ]-----------------------------------------------//
 
-	window.mgExternal = function(trigger, defaultContent, options) {
+	$.mgExternal = window.mgExternal = function(trigger, defaultContent, options) {
 
 		if (!(this instanceof mgExternal))
 			return new mgExternal(trigger, defaultContent, options);
@@ -211,6 +211,8 @@
 	mgExternal.prototype = {
 
 		defaults: {},
+
+		_browserScrollbarWidth: 17, // Default value, will be updated when DOM is ready
 
 		isVisible: function() {
 			if (this.settings.display == 'inline') {
