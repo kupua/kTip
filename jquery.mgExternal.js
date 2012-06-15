@@ -1,5 +1,5 @@
 /**
- * mgExternal 1.0.27
+ * mgExternal 1.0.28
  *
  * Copyright 2012 Ricard Osorio Mañanas
  * Dual licensed under the MIT or GPL Version 2 licenses.
@@ -330,7 +330,13 @@
 				modalContentChangeAnimation.preWidth = this.$content.width();
 			}
 
-			var $dummyContent = this.$content.clone().appendTo(this.$container);
+			var $dummyContent = this.$content.clone();
+
+			if (this.settings.display == 'inline') {
+				$dummyContent.insertBefore(this.$content);
+			} else {
+				$dummyContent.appendTo(this.$container);
+			}
 
 			this.$content
 				.html(html)
@@ -361,13 +367,20 @@
 			this.settings.onContentReady.call(this);
 
 			var proceed = function() {
-				$dummyContent.remove();
 				self.$content.css({
 					left: '',
 					top: '',
 					position: '',
 					visibility: ''
-				}).appendTo(self.$container);
+				});
+
+				if (self.settings.display == 'inline') {
+					self.$content.insertAfter($dummyContent);
+				} else {
+					self.$content.appendTo(self.$container);
+				}
+
+				$dummyContent.remove();
 
 				if (self.isVisible()) {
 					self.setFocus();
