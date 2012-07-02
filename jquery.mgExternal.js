@@ -225,18 +225,13 @@
 		open: function(delay) {
 			var self = this;
 			this._show = true;
-
-			// Avoid button flicker on instant content
-			if (this._defaultContent)
-				this.$trigger.addClass(this.settings.activeClass);
-
 			delay ? setTimeout(function(){self._open()}, delay) : this._open(); // Using a delay value of `0` would still
 			                                                                    // create a noticeable visual effect
 		},
 
 		_open: function() {
 
-			if (!this._show)
+			if (!this._show || this.isVisible())
 				return;
 
 			var self = this;
@@ -382,7 +377,7 @@
 
 				$dummyContent.remove();
 
-				if (self.isVisible()) {
+				if (self.isVisible() && self.$container.css('opacity') == 1) {
 					self.setFocus();
 					return self.moveContainer(modalContentChangeAnimation);
 				} else {
