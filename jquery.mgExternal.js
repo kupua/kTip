@@ -472,9 +472,19 @@
 
 			var self = this;
 
-			this.$content.find('form').bind('submit', function(e){
-				self.loadAjaxContent($(this), {type: 'move'});
+			this.$content.find('form').bind('submit mgExternal_submit', function(e){
 				e.preventDefault();
+				var $elem = $(this);
+				if (e.type == 'mgExternal_submit') {
+					self.loadAjaxContent($elem, {type: 'move'}, 100);
+				} else {
+					// We wrap the call so other events are called first (we give
+					// priority to form validation, custom submits, etc.)
+					setTimeout(function(){
+						if (!e.isPropagationStopped())
+							$elem.trigger('mgExternal_submit');
+					}, 100);
+				}
 			});
 			this.$content.find('[class*="mgExternal-redirect"]').bind('click', function(e){
 				var $elem = $(this);
