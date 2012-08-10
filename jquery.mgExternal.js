@@ -1,5 +1,5 @@
 /**
- * mgExternal 1.0.28
+ * mgExternal 1.0.29
  *
  * Copyright 2012 Ricard Osorio Mañanas
  * Dual licensed under the MIT or GPL Version 2 licenses.
@@ -15,9 +15,15 @@
 //---[ jQuery plugin ]--------------------------------------------------------//
 
 	$.fn.mgExternal = function(defaultContent, options) {
-		return this.each(function(){
-			$(this).data('mgExternal', mgExternal(this, defaultContent, options));
+		var instance;
+		this.each(function(){
+			if ($(this).data('mgExternal')) {
+				instance = $(this).data('mgExternal');
+			} else {
+				$(this).data('mgExternal', mgExternal(this, defaultContent, options));
+			}
 		});
+		return instance || this;
 	};
 
 	$.expr[':'].mgExternal = function(elem) {
@@ -92,7 +98,9 @@
 
 			// Modal settings
 			modal: {
-				animateSpeed: 500
+				animateSpeed: 500,
+				onDisableScroll: function(){},
+				onRestoreScroll: function(){}
 			},
 
 			// Tooltip settings
@@ -293,6 +301,7 @@
 						marginRight: '',
 						overflow: ''
 					});
+					self.settings.modal.onRestoreScroll.call(self);
 					$('#mgExternal-overlay').fadeOut(self.settings.overlayHideSpeed, function(){
 						self.settings.onClose.call(self);
 					});
@@ -449,6 +458,7 @@
 						marginRight: this._browserScrollbarWidth,
 						overflow: 'hidden'
 					});
+					this.settings.modal.onDisableScroll.call(this);
 					$overlay.fadeIn(this.settings.overlayShowSpeed, fadeInContainer);
 				} else {
 					$overlay.fadeIn(this.settings.overlayShowSpeed);
@@ -935,9 +945,10 @@
 				    windowWidth = $(window).width(),
 				    containerHeight = this.$container.outerHeight(true),
 				    containerWidth = this.$container.outerWidth(true),
-				    sourceOffset = this.settings.tooltip.positionSource.offset(),
-				    sourceHeight = this.settings.tooltip.positionSource.outerHeight(),
-				    sourceWidth = this.settings.tooltip.positionSource.outerWidth(),
+				    $source = this.settings.tooltip.positionSource,
+				    sourceOffset = $source.offset(),
+				    sourceHeight = $source.outerHeight(),
+				    sourceWidth = $source.outerWidth(),
 				    distance = this.settings.tooltip.distance,
 				    arrowSize = this.settings.tooltip.arrowSize,
 				    arrowDistance = this.settings.tooltip.arrowDistance,
@@ -1123,6 +1134,29 @@
 					}
 				} else if (this.$tooltipArrow) {
 					this.$tooltipArrow.hide();
+				}
+
+			//---[ Experimental fixed position ]------------------------------//
+
+				if (position == 'bottom') {
+					var $aux = $source,
+					    isFixed = false;
+
+					while (!$aux.is('body')) {
+						if ($aux.css('position') == 'fixed') {
+							isFixed = true;
+							break;
+						}
+						$aux = $aux.parent();
+					}
+
+					if (isFixed) {
+						pos.position = 'fixed';
+						//pos.top = $source.position().top + sourceHeight + 2;
+						pos.top = pos.top - scrollTop;
+					} else {
+						pos.position = 'absolute';
+					}
 				}
 
 			this.$container.css(pos);
