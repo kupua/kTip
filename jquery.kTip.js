@@ -1,5 +1,6 @@
 /**
- * mgExternal 1.0.30
+ * kTip 0.0.1
+ * Based on mgExternal 1.0.30
  *
  * Copyright 2012 Ricard Osorio Mañanas
  * Dual licensed under the MIT or GPL Version 2 licenses.
@@ -14,30 +15,30 @@
 
 //---[ jQuery plugin ]--------------------------------------------------------//
 
-	$.fn.mgExternal = function(defaultContent, options) {
+	$.fn.kTip = function(defaultContent, options) {
 		var instance;
 		this.each(function(){
-			if ($(this).data('mgExternal')) {
-				instance = $(this).data('mgExternal');
+			if ($(this).data('kTip')) {
+				instance = $(this).data('kTip');
 			} else {
-				$(this).data('mgExternal', mgExternal(this, defaultContent, options));
+				$(this).data('kTip', kTip(this, defaultContent, options));
 			}
 		});
 		return instance || this;
 	};
 
-	$.expr[':'].mgExternal = function(elem) {
-		return !!$(elem).data('mgExternal');
+	$.expr[':'].kTip = function(elem) {
+		return !!$(elem).data('kTip');
 	};
 
-//---[ mgExternal constructor ]-----------------------------------------------//
+//---[ kTip constructor ]-----------------------------------------------------//
 
-	$.mgExternal = window.mgExternal = function(trigger, defaultContent, options) {
+	$.kTip = window.kTip = function(trigger, defaultContent, options) {
 
-		if (!(this instanceof mgExternal))
-			return new mgExternal(trigger, defaultContent, options);
+		if (!(this instanceof kTip))
+			return new kTip(trigger, defaultContent, options);
 
-		// trigger is optional when used only once. Eg: mgExternal("Hi!");
+		// trigger is optional when used only once. Eg: kTip("Hi!");
 		if (!trigger || !trigger.nodeType) {
 			options = defaultContent;
 			defaultContent = trigger;
@@ -53,11 +54,11 @@
 
 		// Unique identifier
 		this._unique = Math.random().toString().substr(2);
-		mgExternal.instances.register(this);
+		kTip.instances.register(this);
 
-		// data-mg-external-options HTML attributes are a valid alternate method
+		// data-ktip-options HTML attributes are a valid alternate method
 		// of passing options
-		options = $.extend(true, {}, this.defaults, options, $(trigger).data('mgExternalOptions'));
+		options = $.extend(true, {}, this.defaults, options, $(trigger).data('ktipOptions'));
 
 		// Default settings
 		this.settings = {
@@ -97,7 +98,7 @@
 			// Ajax
 			ajaxUrl: null, // URL to fetch data from (if no defaultContent is provided or a form is sent)
 			ajaxData: { // Additional arguments to be sent
-				'mgExternal-unique': this._unique
+				'kTip-unique': this._unique
 			},
 
 			// Modal settings
@@ -204,7 +205,7 @@
 
 //---[ Instances ]------------------------------------------------------------//
 
-	mgExternal.instances = {
+	kTip.instances = {
 
 		_instances: {},
 
@@ -217,9 +218,9 @@
 		}
 	};
 
-//---[ mgExternal prototype ]-------------------------------------------------//
+//---[ kTip prototype ]-------------------------------------------------------//
 
-	mgExternal.prototype = {
+	kTip.prototype = {
 
 		defaults: {},
 
@@ -254,10 +255,10 @@
 
 				var url = this.settings.ajaxUrl || this.$trigger.attr('href');
 
-				if (url && this._defaultContent && this._defaultContent.indexOf('mgExternal-preloader') >= 0) {
+				if (url && this._defaultContent && this._defaultContent.indexOf('kTip-preloader') >= 0) {
 					this.setContent(this._defaultContent);
 					setTimeout(function(){
-						self.$content.find('.mgExternal-preloader').attr('href', url).trigger('click');
+						self.$content.find('.kTip-preloader').attr('href', url).trigger('click');
 					}, this.settings.showSpeed);
 				} else if (this._defaultContent) {
 					this.setContent(this._defaultContent);
@@ -305,7 +306,7 @@
 						overflow: ''
 					});
 					self.settings.modal.onRestoreScroll.call(self);
-					$('#mgExternal-overlay').fadeOut(self.settings.overlayHideSpeed, function(){
+					$('#kTip-overlay').fadeOut(self.settings.overlayHideSpeed, function(){
 						self.settings.onClose.call(self);
 					});
 				} else {
@@ -314,7 +315,7 @@
 			});
 
 			if (this.settings.display == 'tooltip' && this.settings.overlayShow) {
-				$('#mgExternal-overlay').fadeOut(this.settings.overlayHideSpeed, function(){
+				$('#kTip-overlay').fadeOut(this.settings.overlayHideSpeed, function(){
 					self.$trigger.css({
 						position: self._triggerZIndexBackup.position,
 						zIndex: self._triggerZIndexBackup.zIndex
@@ -450,7 +451,7 @@
 			};
 			if (this.settings.overlayShow) {
 
-				var $overlay = $('#mgExternal-overlay');
+				var $overlay = $('#kTip-overlay');
 				$overlay.css({
 					background: this.settings.overlayColor,
 					opacity: this.settings.overlayOpacity
@@ -479,28 +480,28 @@
 				this.$container.remove()
 			}
 			this.settings.onDestroy.call(this);
-			this.$trigger.removeData('mgExternal');
+			this.$trigger.removeData('kTip');
 		},
 
 		bindSpecialActions: function() {
 
 			var self = this;
 
-			this.$content.find('form').bind('submit mgExternal_submit', function(e){
+			this.$content.find('form').bind('submit kTip_submit', function(e){
 				e.preventDefault();
 				var $elem = $(this);
-				if (e.type == 'mgExternal_submit') {
+				if (e.type == 'kTip_submit') {
 					self.loadAjaxContent($elem, {type: 'move'}, 100);
 				} else {
 					// We wrap the call so other events are called first (we give
 					// priority to form validation, custom submits, etc.)
 					setTimeout(function(){
 						if (!e.isPropagationStopped())
-							$elem.trigger('mgExternal_submit');
+							$elem.trigger('kTip_submit');
 					}, 100);
 				}
 			});
-			this.$content.find('[class*="mgExternal-redirect"]').bind('click', function(e){
+			this.$content.find('[class*="kTip-redirect"]').bind('click', function(e){
 				var $elem = $(this);
 
 				$elem.addClass(self.settings.loadingClass); // Why repeat? Already used in loadAjaxContent
@@ -524,7 +525,7 @@
 
 				e.preventDefault();
 			});
-			this.$content.find('.mgExternal-close').bind('click', function(e){
+			this.$content.find('.kTip-close').bind('click', function(e){
 				self.close();
 				e.preventDefault();
 			});
@@ -565,7 +566,7 @@
 			if (submit && submit.attr('enctype') == 'multipart/form-data') {
 
 				// Create a random ID for the new iframe
-				var iframeName = 'mgExternal-iframe'+Math.floor(Math.random()*99999);
+				var iframeName = 'kTip-iframe'+Math.floor(Math.random()*99999);
 
 				// Create the iframe
 				$('<iframe name="'+iframeName+'" id="'+iframeName+'" src="" style="display:none;"></iframe>')
@@ -636,12 +637,12 @@
 
 		setLoadingState: function() {
 			this.$content.find(':input').prop('disabled', true).addClass('disabled');
-			this.$content.find('.mgExternal-loading').show();
+			this.$content.find('.kTip-loading').show();
 		},
 
 		disableLoadingState: function() {
 			this.$content.find(':input').prop('disabled', false).removeClass('disabled');
-			this.$content.find('.mgExternal-loading').hide();
+			this.$content.find('.kTip-loading').hide();
 		},
 
 		setFocus: function() {
@@ -672,7 +673,7 @@
 
 			if (!this.$container) {
 				this.$container = $('<div/>')
-					.addClass('mgExternal-container')
+					.addClass('kTip-container')
 					.addClass(this.settings.extraClass)
 					.css({
 						position: 'absolute',
@@ -700,7 +701,7 @@
 					});
 
 				this.$content = $('<div/>')
-					.addClass('mgExternal-content')
+					.addClass('kTip-content')
 					.css(this.settings.css)
 					.appendTo(this.$container);
 
@@ -747,9 +748,9 @@
 				self.settings.onCreateElements.call(self);
 			}
 
-			if (this.settings.overlayShow && $('#mgExternal-overlay').length == 0) {
+			if (this.settings.overlayShow && $('#kTip-overlay').length == 0) {
 				$('<div/>')
-					.attr('id', 'mgExternal-overlay')
+					.attr('id', 'kTip-overlay')
 					.css({
 						height: '100%', // 100% doesn't work properly on touchscreens
 						left: 0,
@@ -764,20 +765,20 @@
 
 			if (!this.$tooltipArrow && this.settings.display == 'tooltip' && this.settings.tooltip.arrowSize) {
 				this.$tooltipArrow = $('<div/>')
-					.addClass('mgExternal-arrow')
+					.addClass('kTip-arrow')
 					.css({
 						position: 'absolute'
 					})
 					.appendTo(this.$container)
 					.append($('<div/>')
-						.addClass('mgExternal-arrow-shadow')
+						.addClass('kTip-arrow-shadow')
 						.css({
 							borderStyle: 'solid',
 							borderWidth: this.settings.tooltip.arrowSize
 						})
 					)
 					.append($('<div/>')
-						.addClass('mgExternal-arrow-front')
+						.addClass('kTip-arrow-front')
 						.css({
 							borderColor: this.settings.tooltip.arrowFrontColor || this.$content.css('background-color'),
 							borderStyle: 'solid',
@@ -923,7 +924,7 @@
 								top: 0,
 								visibility: 'hidden'
 							})
-							.find('.mgExternal-content')
+							.find('.kTip-content')
 								.css({
 									height: this.settings.css.height || '',
 									width: this.settings.css.width || ''
@@ -933,8 +934,8 @@
 							.appendTo('body');
 
 						this.$content.css({
-							//height: $tempContainer.find('.mgExternal-content').height()
-							width: $tempContainer.find('.mgExternal-content').width()
+							//height: $tempContainer.find('.kTip-content').height()
+							width: $tempContainer.find('.kTip-content').width()
 						});
 
 						$tempContainer.remove();
@@ -1110,10 +1111,10 @@
 							borderRightColor: 'transparent',
 							borderBottomWidth: position == 'top' ? 0 : arrowSize,
 							borderTopWidth: position == 'bottom' ? 0 : arrowSize
-						}).filter('.mgExternal-arrow-front').css({
+						}).filter('.kTip-arrow-front').css({
 							left: 0,
 							top: (position == 'top' ? '-' : '')+this.$content.css('borderBottomWidth')
-						}).end().filter('.mgExternal-arrow-shadow')
+						}).end().filter('.kTip-arrow-shadow')
 							.css('border-'+position+'-color', this.$content.css('border-'+(position == 'top' ? 'bottom' : 'top')+'-color'));
 					} else {
 						this.$tooltipArrow.css({
@@ -1130,10 +1131,10 @@
 							borderTopColor: 'transparent',
 							borderLeftWidth: position == 'right' ? 0 : arrowSize,
 							borderRightWidth: position == 'left' ? 0 : arrowSize
-						}).filter('.mgExternal-arrow-front').css({
+						}).filter('.kTip-arrow-front').css({
 							left: (position == 'left' ? '-' : '')+this.$content.css('borderBottomWidth'),
 							top: 0
-						}).end().filter('.mgExternal-arrow-shadow')
+						}).end().filter('.kTip-arrow-shadow')
 							.css('border-'+position+'-color', this.$content.css('border-'+(position == 'left' ? 'right' : 'left')+'-color'));
 					}
 				} else if (this.$tooltipArrow) {
@@ -1175,7 +1176,7 @@
 			.append($('<div/>').css('height', '100%'))
 			.appendTo('body');
 
-		window.mgExternal.prototype._browserScrollbarWidth = $testDiv.find('> div').width()
+		window.kTip.prototype._browserScrollbarWidth = $testDiv.find('> div').width()
 		                                                   - $testDiv.css('overflow-y', 'scroll').find('> div').width();
 		$testDiv.remove();
 	});
