@@ -63,7 +63,7 @@
 		this.settings = {
 
 			// Core
-			display: 'tooltip', // modal, tooltip or inline
+			display: 'tooltip', // tooltip, modal
 			auto: !trigger, // Auto-open, default false if a trigger exists
 			renew: true, // Should each call fetch new data
 			autoFocus: true, // Auto-focus first input element
@@ -73,7 +73,7 @@
 
 			// Appearance
 			css: {}, // Custom CSS
-			extraClass: (options && options.display) ? (options.display != 'inline' ? 'kT-'+options.display : null) : 'kT-tooltip',
+			extraClass: (options && options.display) ? 'kT-'+options.display : 'kT-tooltip',
 			activeClass: 'active',
 			loadingClass: 'loading',
 			showDelay: (options && options.tooltip && options.tooltip.bind == 'hover') ? 200 : 0, // Show delay in ms
@@ -93,7 +93,7 @@
 			zIndexContainer: 999,
 			zIndexTooltipTrigger: 998,
 			zIndexOverlay: 997,
-			breatheSeparation: (options && options.display == 'modal') ? 30 : 15,
+			breatheSeparation: (options && options.display == 'modal') ? 30 : 0,
 
 			// Ajax
 			ajaxUrl: null, // URL to fetch data from (if no defaultContent is provided or a form is sent)
@@ -137,7 +137,7 @@
 		// Internal jQuery elements
 		this.$trigger = $(trigger);
 		this.$container = null;
-		this.$content = (options && options.display == 'inline') ? this.$trigger : null;
+		this.$content = null;
 		this.$tooltipArrow = null;
 
 		// Private vars
@@ -189,10 +189,6 @@
 							break;
 					}
 					break;
-
-				case 'inline':
-					this.bindSpecialActions();
-					break;
 			}
 		}
 
@@ -210,11 +206,7 @@
 		_browserScrollbarWidth: 17, // Default value, will be updated when DOM is ready
 
 		isVisible: function() {
-			if (this.settings.display == 'inline') {
-				return true;
-			} else {
-				return !!this.$container && this.$container.is(':visible');
-			}
+			return !!this.$container && this.$container.is(':visible');
 		},
 
 		open: function(delay) {
@@ -265,7 +257,7 @@
 
 		_close: function() {
 
-			if (this._show || this.settings.display == 'inline' || !this.isVisible() || this.settings.onBeforeClose.call(this) === false)
+			if (this._show || !this.isVisible() || this.settings.onBeforeClose.call(this) === false)
 				return;
 
 			var self = this;
@@ -311,7 +303,7 @@
 
 			var self = this;
 
-			if (!this.$container && this.settings.display != 'inline')
+			if (!this.$container)
 				this.createElements();
 
 			if (this.settings.display == 'modal') {
@@ -323,11 +315,7 @@
 
 			var $dummyContent = this.$content.clone();
 
-			if (this.settings.display == 'inline') {
-				$dummyContent.insertBefore(this.$content);
-			} else {
-				$dummyContent.appendTo(this.$container);
-			}
+			$dummyContent.appendTo(this.$container);
 
 			this.$content
 				.html(html)
@@ -365,11 +353,7 @@
 					visibility: ''
 				});
 
-				if (self.settings.display == 'inline') {
-					self.$content.insertAfter($dummyContent);
-				} else {
-					self.$content.appendTo(self.$container);
-				}
+				self.$content.appendTo(self.$container);
 
 				$dummyContent.remove();
 
@@ -398,7 +382,7 @@
 
 		showContainer: function() {
 
-			if (this.settings.display == 'inline' || this.settings.onBeforeShow.call(this) === false)
+			if (this.settings.onBeforeShow.call(this) === false)
 				return;
 
 			var self = this;
