@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Tests - kTip</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="kTip.css" />
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+	<script src="jquery.kTip.js"></script>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+		}
+
+		body {
+			background-color: #eee;
+			font: 14px/1.5 arial, sans-serif;
+		}
+
+		p {
+			margin-bottom: 15px;
+		}
+
+		#base {
+			background-color: #fff;
+			margin: 60px auto;
+			min-height: 2000px;
+			padding: 30px;
+			max-width: 400px;
+		}
+
+		.button {
+			background-color: #38c;
+			border-radius: 5px;
+			color: #fff;
+			cursor: pointer;
+			display: inline-block;
+			font-weight: bold;
+			padding: 10px 20px;
+		}
+
+		.button + .button {
+			margin-left: 5px;
+		}
+
+		.button:hover {
+			background-color: #16a;
+		}
+
+		.button.modal {
+			background-color: #c33;
+		}
+
+		.button.modal:hover {
+			background-color: #a11;
+		}
+
+		.button.active {
+			background-color: #000;
+		}
+
+		.button.disabled {
+			background-color: #eee;
+			color: #888;
+			cursor: not-allowed;
+		}
+	</style>
+</head>
+<body>
+	<div id="base">
+		<p><span class="button default-call">Default call</span> <span class="button modal default-call">Default call</span></p>
+		<p><span class="button large-default-content">Large default content</span> <span class="button modal large-default-content">Large default content</span></p>
+		<p><span class="button default-overlay">Default overlay</span> <span class="button modal default-overlay">Default overlay</span></p>
+		<p><span class="button black-overlay">Black overlay</span> <span class="button modal black-overlay">Black overlay</span></p>
+		<p><span class="button auto-trigger">Auto-trigger</span></p>
+		<p><span class="button block-close">Block close</span> <span class="button modal block-close">Block close</span></p>
+		<p><span class="button slow">Slow</span> <span class="button modal slow">Slow</span></p>
+	</div>
+
+<script>
+(function(){
+
+	function test(selector, args) {
+		$(selector).each(function(){
+			var $elem = $(this);
+			if ($elem.hasClass('modal')) {
+				$elem.kTip.apply($elem, $.extend(true, [], [null, {display: 'modal', css: {padding: 30}}], args));
+			} else {
+				$elem.kTip.apply($elem, $.extend(true, [], [null, {css: {padding: 15}}], args));
+				$elem.kTip.apply($elem, args);
+			}
+		});
+	}
+
+	// Default call
+	test('.default-call', ["Default call"]);
+
+	// Large default content
+	test('.large-default-content', [
+		(new Array(500)).join("Large default content "),
+		{
+			css: {
+				maxWidth: 600
+			}
+		}
+	]);
+
+	// Default overlay
+	test('.default-overlay', [
+		"Default overlay",
+		{
+			overlay: true
+		}
+	]);
+
+	// Black overlay
+	test('.black-overlay', [
+		"Black overlay",
+		{
+			overlay: true,
+			overlayColor: '#000'
+		}
+	]);
+
+	// Auto trigger
+	test('.auto-trigger', [
+		"Auto trigger",
+		{
+			auto: true
+		}
+	]);
+
+	// Block close
+	test('.block-close', [
+		"<p>Block close <a href='#' class='kTip-close'>close</a></p><p>No ESC or outside click to close.</p>",
+		{
+			outsideClose: false,
+			escClose: false
+		}
+	]);
+
+	// Slow
+	test('.slow', [
+		"Slow",
+		{
+			showDelay: 1000,
+			hideDelay: 1000,
+			showSpeed: 1000,
+			hideSpeed: 1000,
+			overlayShowSpeed: 1000,
+			overlayHideSpeed: 1000
+		}
+	]);
+
+})();
+</script>
+</body>
+</html>
