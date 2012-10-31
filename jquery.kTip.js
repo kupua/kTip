@@ -11,7 +11,7 @@
  *   - Test callbacks
  */
 
-(function($, undefined){
+(function($, window, undefined){
 
 //---[ jQuery plugin ]--------------------------------------------------------//
 
@@ -51,10 +51,6 @@
 			options = defaultContent;
 			defaultContent = null;
 		}
-
-		// Unique identifier
-		this._unique = Math.random().toString().substr(2);
-		kTip.instances.register(this);
 
 		// data-ktip-options HTML attributes are a valid alternate method
 		// of passing options
@@ -148,7 +144,7 @@
 		this._lastSubmitName = null;
 		this._show = false;
 		this._triggerZIndexBackup = null;
-		this._preventNextMouseUp = false;
+		this._preventNextClick = false;
 		this._moveTooltipTimeout = null;
 		this._currentAjaxRequest = null;
 
@@ -172,21 +168,21 @@
 							this.$trigger.bind('click', function(e){
 								self.isVisible() ? self.close() : self.open(self.settings.showDelay);
 								e.preventDefault();
-								e.stopPropagation();
+								//e.stopPropagation();
 							});
 							break;
 						case 'hover':
 							this.$trigger.bind({
 								mouseenter: function(){self.open(self.settings.showDelay)},
 								mouseleave: function(){self.close(self.settings.hideDelay)},
-								mouseup: function(e){e.stopPropagation()}
+								click: function(e){e.stopPropagation()}
 							});
 							break;
 						case 'focus':
 							this.$trigger.bind({
 								focus: function(){self.open(self.settings.showDelay)},
 								blur: function(){self.close(self.settings.hideDelay)},
-								mouseup: function(e){e.stopPropagation()}
+								click: function(e){e.stopPropagation()}
 							});
 							break;
 					}
@@ -201,21 +197,6 @@
 		// Auto-open if set
 		if (this.settings.auto)
 			this.open();
-	};
-
-//---[ Instances ]------------------------------------------------------------//
-
-	kTip.instances = {
-
-		_instances: {},
-
-		register: function(instance) {
-			this._instances[instance._unique] = instance;
-		},
-
-		get: function(unique) {
-			return this._instances[unique];
-		}
 	};
 
 //---[ kTip prototype ]-------------------------------------------------------//
@@ -693,11 +674,9 @@
 							})
 							.appendTo('body')
 						: 'body')
-					.bind('mouseup', function(e){
-						// Required if outsideClose is set to true.
-						// mouseup event is used instead of click
-						// due to IE incompatibility
-						self._preventNextMouseUp = true;
+					.bind('click', function(e){
+						// Required if outsideClose is set to true
+						self._preventNextClick = true;
 					});
 
 				this.$content = $('<div/>')
@@ -719,19 +698,16 @@
 				// Hide on outside click
 				if (this.settings.outsideClose) {
 
-					// Using mouseup event due to IE incompatibility. Also using
-					// body instead of document as clicking on the sidebar would
-					// trigger the event.
-					$('body').bind('mouseup', function(e){
+					// Using body instead of document as clicking on the sidebar
+					// would trigger the event.
+					$('body').bind('click', function(e){
 						// tooltip bind == 'click' gives problems in certain situations
 						// (showSpeed == 0 && hideSpeed == 0)
 						if (!self.$trigger.is(e.target) && !self.$trigger.find(e.target).length) {
-							if (self._preventNextMouseUp) {
-								self._preventNextMouseUp = false;
+							if (self._preventNextClick) {
+								self._preventNextClick = false;
 							} else if (e.which == 1 && self.isVisible()) {
-								// Workaround for Firefox as it fires mouseup events when clicking on the scrollbar
-								if (!e.originalEvent.originalTarget || !(e.originalEvent.originalTarget instanceof XULElement))
-									self.close();
+								self.close();
 							}
 						}
 					});
