@@ -60,7 +60,7 @@
 		this.settings = {
 
 			// Core
-			display: 'modal', // modal, tooltip or inline
+			display: 'tooltip', // modal, tooltip or inline
 			auto: !trigger, // Auto-open, default false if a trigger exists
 			renew: true, // Should each call fetch new data
 			autoFocus: true, // Auto-focus first input element
@@ -70,14 +70,14 @@
 
 			// Appearance
 			css: {}, // Custom CSS
-			extraClass: (options && options.display) ? (options.display != 'inline' ? 'mgE-'+options.display : null) : 'mgE-modal',
+			extraClass: (options && options.display) ? (options.display != 'inline' ? 'mgE-'+options.display : null) : 'mgE-tooltip',
 			activeClass: 'active',
 			loadingClass: 'loading',
-			showDelay: (options && options.display == 'tooltip' && options.tooltip && options.tooltip.bind == 'hover') ? 200 : 0, // Show delay in ms
-			hideDelay: (options && options.display == 'tooltip' && options.tooltip && options.tooltip.bind == 'hover') ? 200 : 0, // Hide delay in ms
+			showDelay: (options && options.tooltip && options.tooltip.bind == 'hover') ? 200 : 0, // Show delay in ms
+			hideDelay: (options && options.tooltip && options.tooltip.bind == 'hover') ? 200 : 0, // Hide delay in ms
 			showSpeed: 300,
 			hideSpeed: 300,
-			overlayShow: (!options || !options.display || options.display == 'modal') ? true : false,
+			overlay: (options && options.display == 'modal') ? true : false,
 			overlayColor: '#fff',
 			overlayOpacity: 0.7, // Opacity from 0 to 1
 			overlayShowSpeed: 300,
@@ -89,7 +89,7 @@
 			zIndexContainer: 999,
 			zIndexTooltipTrigger: 998,
 			zIndexOverlay: 997,
-			breatheSeparation: (options && options.display == 'tooltip') ? 15 : 30,
+			breatheSeparation: (options && options.display == 'modal') ? 30 : 15,
 
 			// Ajax
 			ajaxUrl: null, // URL to fetch data from (if no defaultContent is provided or a form is sent)
@@ -280,7 +280,7 @@
 				if (self.settings.destroyOnClose)
 					self.destroy();
 
-				if (self.settings.display == 'modal' && self.settings.overlayShow) {
+				if (self.settings.display == 'modal' && self.settings.overlay) {
 					self.$container.parent().hide();
 					$('body').css({
 						marginRight: '',
@@ -295,7 +295,7 @@
 				}
 			});
 
-			if (this.settings.display == 'tooltip' && this.settings.overlayShow) {
+			if (this.settings.display == 'tooltip' && this.settings.overlay) {
 				$('#kTip-overlay').fadeOut(this.settings.overlayHideSpeed, function(){
 					self.$trigger.css({
 						position: self._triggerZIndexBackup.position,
@@ -403,7 +403,7 @@
 
 			this.$trigger.addClass(this.settings.activeClass);
 
-			if (this.settings.display == 'tooltip' && this.settings.overlayShow) {
+			if (this.settings.display == 'tooltip' && this.settings.overlay) {
 				this._triggerZIndexBackup = {
 					position: this.$trigger.css('position') == 'static' ? '' : this.$trigger.css('position'),
 					zIndex: this.$trigger.css('z-index') == 0 ? '' : this.$trigger.css('z-index')
@@ -417,7 +417,7 @@
 			// Fade container in, and call onShow. If it's a modal, fade
 			// overlay in before
 			var fadeInContainer = function(){
-				if (self.settings.display == 'modal' && self.settings.overlayShow)
+				if (self.settings.display == 'modal' && self.settings.overlay)
 					self.$container.parent().show();
 
 				// Set correct position before showing
@@ -430,7 +430,7 @@
 					self.settings.onShow.call(self);
 				});
 			};
-			if (this.settings.overlayShow) {
+			if (this.settings.overlay) {
 
 				var $overlay = $('#kTip-overlay');
 				$overlay.css({
@@ -455,7 +455,7 @@
 		},
 
 		destroy: function() {
-			if (this.settings.display == 'modal' && this.settings.overlayShow) {
+			if (this.settings.display == 'modal' && this.settings.overlay) {
 				this.$container.parent().remove();
 			} else {
 				this.$container.remove()
@@ -661,7 +661,7 @@
 						zIndex: this.settings.zIndexContainer
 					})
 					.hide()
-					.appendTo(this.settings.display == 'modal' && this.settings.overlayShow
+					.appendTo(this.settings.display == 'modal' && this.settings.overlay
 						? $('<div/>')
 							.css({
 								height: '100%',
@@ -724,7 +724,7 @@
 				self.settings.onCreateElements.call(self);
 			}
 
-			if (this.settings.overlayShow && $('#kTip-overlay').length == 0) {
+			if (this.settings.overlay && $('#kTip-overlay').length == 0) {
 				$('<div/>')
 					.attr('id', 'kTip-overlay')
 					.css({
@@ -808,9 +808,9 @@
 			    containerWidth = this.$container.outerWidth(true),
 			    wrapperHeight = $(window).height(),
 			    wrapperWidth = $(window).width(),
-			    scrollTop = this.settings.overlayShow ? 0 : $(document).scrollTop();
+			    scrollTop = this.settings.overlay ? 0 : $(document).scrollTop();
 
-			if (this.settings.overlayShow)
+			if (this.settings.overlay)
 				containerWidth += this._browserScrollbarWidth;
 
 			if (containerHeight < wrapperHeight)
