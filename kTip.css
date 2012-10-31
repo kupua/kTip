@@ -8,6 +8,12 @@
 html { overflow-y: visible !important; }
 body { overflow-y: scroll; }
 
+/*
+ * Pages with few content won't use the full window, and clicking outside to
+ * close will not work
+ */
+html, body { height: 100%; }
+
 /* Style: default modal */
 .kT-modal .kTip-content {
 	background-color: #fff;
