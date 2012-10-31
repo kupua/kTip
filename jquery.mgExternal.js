@@ -1,5 +1,5 @@
 /**
- * mgExternal 1.0.29
+ * mgExternal 1.0.30
  *
  * Copyright 2012 Ricard Osorio Mañanas
  * Dual licensed under the MIT or GPL Version 2 licenses.
@@ -54,6 +54,10 @@
 		// Unique identifier
 		this._unique = Math.random().toString().substr(2);
 		mgExternal.instances.register(this);
+
+		// data-mg-external-options HTML attributes are a valid alternate method
+		// of passing options
+		options = $.extend(true, {}, this.defaults, options, $(trigger).data('mgExternalOptions'));
 
 		// Default settings
 		this.settings = {
@@ -128,9 +132,8 @@
 			onJsonData:       function(data){}
 		};
 
-		// data-mg-external HTML attributes are a valid alternate method of
-		// passing options
-		$.extend(true, this.settings, this.defaults, options, $(trigger).data('mgExternal'));
+		// Apply options
+		$.extend(true, this.settings, options);
 
 		// Internal jQuery elements
 		this.$trigger = $(trigger);
@@ -476,6 +479,7 @@
 				this.$container.remove()
 			}
 			this.settings.onDestroy.call(this);
+			this.$trigger.removeData('mgExternal');
 		},
 
 		bindSpecialActions: function() {
