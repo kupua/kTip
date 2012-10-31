@@ -7,8 +7,11 @@
  *
  * TODO:
  *   - Infinite linked tooltips
- *   - Solve inline functionality
  *   - Test callbacks
+ *   - Fit to mobile
+ *   - Hide if trigger is hidden
+ *   - Aware of z-index
+ *   - Detect ajaxForm
  */
 
 (function($, window, undefined){
@@ -70,7 +73,7 @@
 
 			// Appearance
 			css: {}, // Custom CSS
-			extraClass: (options && options.display) ? (options.display != 'inline' ? 'mgE-'+options.display : null) : 'mgE-tooltip',
+			extraClass: (options && options.display) ? (options.display != 'inline' ? 'kT-'+options.display : null) : 'kT-tooltip',
 			activeClass: 'active',
 			loadingClass: 'loading',
 			showDelay: (options && options.tooltip && options.tooltip.bind == 'hover') ? 200 : 0, // Show delay in ms
@@ -84,6 +87,7 @@
 			overlayHideSpeed: 300,
 			submitIdentifier: 'input[type="submit"]',
 			focusPriority: [
+				'[autofocus]:visible:enabled:first',
 				':not(:radio):input:visible:enabled:first'
 			],
 			zIndexContainer: 999,
@@ -93,9 +97,7 @@
 
 			// Ajax
 			ajaxUrl: null, // URL to fetch data from (if no defaultContent is provided or a form is sent)
-			ajaxData: { // Additional arguments to be sent
-				'kTip-unique': this._unique
-			},
+			ajaxData: {}, // Additional arguments to be sent
 
 			// Modal settings
 			modal: {
@@ -158,7 +160,7 @@
 					this.$trigger.bind('click', function(e){
 						self.open(self.settings.showDelay);
 						e.preventDefault();
-						e.stopPropagation();
+						//e.stopPropagation();
 					});
 					break;
 
