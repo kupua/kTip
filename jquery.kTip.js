@@ -59,7 +59,7 @@
 			trigger = null;
 		}
 
-		// No defaultContent is required, as long as settings.ajaxUrl is set
+		// No defaultContent is required, as long as settings.ajax.url is set
 		// or an href attribute is provided
 		if (typeof defaultContent == 'object') {
 			options = defaultContent;
@@ -107,9 +107,12 @@
 			zIndexOverlay: 997,
 			breatheSeparation: (options && options.display == 'modal') ? 30 : 0,
 
-			// Ajax
-			ajaxUrl: null, // URL to fetch data from (if no defaultContent is provided or a form is sent)
-			ajaxData: {}, // Additional arguments to be sent
+			// Ajax built-in functionality
+			ajax: {
+				url: null, // URL to fetch data from (if no defaultContent is provided or a form is sent)
+				data: {}, // Additional arguments to be sent
+				handleForms: true // Depends on the existence of the jQuery Form Plugin (https://github.com/malsup/form)
+			},
 
 			// Modal settings
 			modal: {
@@ -140,7 +143,12 @@
 			onContentReady:   function(){},
 			onStartLoading:   function(){},
 			onStopLoading:    function(){},
-			onJsonData:       function(data){}
+			onFailedRequest: function(jqXHR, textStatus, errorThrown) {
+				alert("Please implement onFailedRequest to manage failed ajax requests.");
+			},
+			onJsonData: function(data){
+				alert("Please implement onJsonData to manage ajax JSON responses.");
+			}
 		};
 
 		// Apply options
@@ -154,13 +162,13 @@
 
 		// Private vars
 		this._defaultContent = defaultContent;
-		this._defaultAjaxUrl = this.settings.ajaxUrl;
+		this._defaultAjaxUrl = this.settings.ajax.url;
 		this._lastSubmitName = null;
 		this._show = false;
 		this._triggerZIndexBackup = null;
 		this._preventNextClick = false;
-		this._moveTooltipTimeout = null;
-		this._currentAjaxRequest = null;
+		this._moveTimeout = null;
+		// this._currentAjaxRequest = null;
 
 		// Set trigger bindings
 		if (this.$trigger) {
@@ -239,10 +247,10 @@
 
 			// New content
 			if (this.settings.renew || !this.$container) {
-				this.settings.ajaxUrl = this._defaultAjaxUrl;
+				this.settings.ajax.url = this._defaultAjaxUrl;
 				this._lastSubmitName = null;
 
-				var url = this.settings.ajaxUrl || this.$trigger.attr('href');
+				var url = this.settings.ajax.url || this.$trigger.attr('href');
 
 				if (this._defaultContent) {
 					this.setContent(this._defaultContent);
@@ -250,10 +258,10 @@
 					if (url.match(/\.(jpg|gif|png|bmp|jpeg)(.*)?$/i)) {
 						this.setContent('<img src="'+url+'" style="display:block;" />');
 					} else {
-						this.loadAjaxContent();
+						this.loadAjaxContent(url);
 					}
 				} else {
-					throw "kTip: no defaultContent or ajaxUrl provided.";
+					throw "kTip: no defaultContent or settings.ajax.url provided.";
 				}
 			}
 			// Show existing content
@@ -276,7 +284,7 @@
 
 			var self = this;
 
-			this.abortCurrentAjaxRequest();
+			// this.abortCurrentAjaxRequest();
 			this.$trigger.removeClass(this.settings.loadingClass).removeClass(this.settings.activeClass);
 			this.settings.onStopLoading.call(this);
 
@@ -469,24 +477,51 @@
 
 			var self = this;
 
-			this.$content.find('form').bind('submit kTip_submit', function(e){
-				e.preventDefault();
-				var $elem = $(this);
-				if (e.type == 'kTip_submit') {
-					self.loadAjaxContent($elem, {type: 'move'}, 100);
-				} else {
-					// We wrap the call so other events are called first (we give
-					// priority to form validation, custom submits, etc.)
-					setTimeout(function(){
-						if (!e.isPropagationStopped())
-							$elem.trigger('kTip_submit');
-					}, 100);
-				}
-			});
+			if (this.settings.ajax.handleForms && $.fn.ajaxSubmit) {
+				this.$content.find('form').bind('submit', function(e){
+					var $form = $(this);
+					e.preventDefault();
+					self._lastSubmitName = $form.find(self.settings.submitIdentifier).val();
+					$form.ajaxSubmit({
+						url: $form.attr('action') || self.settings.ajax.url,
+						data: self.settings.ajax.data,
+						success: function(data) {
+							self.disableLoadingState();
+							self.settings.onStopLoading.call(self);
+
+							if (typeof data == 'object') {
+								self.settings.onJsonData.call(self, data);
+							} else {
+								self.setContent(data);
+							}
+						},
+						error: function(jqXHR, textStatus, errorThrown){
+							self.settings.onFailedRequest.call(self, jqXHR, textStatus, errorThrown);
+						}
+					});
+					self.setLoadingState(); // After submit as we are disabling all input fields
+				});
+			}
+
+			// this.$content.find('form').bind('submit kTip_submit', function(e){
+			// 	e.preventDefault();
+			// 	var $elem = $(this);
+			// 	if (e.type == 'kTip_submit') {
+			// 		self.loadAjaxContent($elem, {type: 'move'}, 100);
+			// 	} else {
+			// 		// We wrap the call so other events are called first (we give
+			// 		// priority to form validation, custom submits, etc.)
+			// 		setTimeout(function(){
+			// 			if (!e.isPropagationStopped())
+			// 				$elem.trigger('kTip_submit');
+			// 		}, 100);
+			// 	}
+			// });
+
 			this.$content.find('[class*="kTip-redirect"]').bind('click', function(e){
 				var $elem = $(this);
 
-				$elem.addClass(self.settings.loadingClass); // Why repeat? Already used in loadAjaxContent
+				// $elem.addClass(self.settings.loadingClass); // Why repeat? Already used in loadAjaxContent
 
 				var modalContentChangeAnimation = {};
 
@@ -502,8 +537,8 @@
 					}
 				}
 
-				self.settings.ajaxUrl = $elem.attr('href');
-				self.loadAjaxContent(null, modalContentChangeAnimation);
+				self.settings.ajax.url = $elem.attr('href');
+				self.loadAjaxContent($elem.attr('href'), modalContentChangeAnimation);
 
 				e.preventDefault();
 			});
@@ -513,86 +548,86 @@
 			});
 		},
 
-		abortCurrentAjaxRequest: function() {
-			if (this._currentAjaxRequest) {
-				this._currentAjaxRequest.abort();
-				this._currentAjaxRequest = null;
-			}
-		},
+		// abortCurrentAjaxRequest: function() {
+		// 	if (this._currentAjaxRequest) {
+		// 		this._currentAjaxRequest.abort();
+		// 		this._currentAjaxRequest = null;
+		// 	}
+		// },
 
-		loadAjaxContent: function(submit, modalContentChangeAnimation) {
+		loadAjaxContent: function(url, modalContentChangeAnimation) {
 
-			this.abortCurrentAjaxRequest();
+			// this.abortCurrentAjaxRequest();
 
-			var self = this,
-				ajaxData = $.extend({}, self.settings.ajaxData);
+			var self = this;
+				// ajaxData = $.extend({}, self.settings.ajaxData);
 
-			this.$trigger.addClass(this.settings.loadingClass);
+			this.setLoadingState();
 			this.settings.onStartLoading.call(this);
 
-			if (submit) {
-				this._lastSubmitName = submit.find(this.settings.submitIdentifier).val();
-				submit.find(':input').each(function(){
-					if ($(this).is(':checkbox')) {
-						ajaxData[$(this).attr('name')] = $(this).prop('checked') ? 1 : 0;
-					} else if ($(this).is(':radio')) {
-						if ($(this).prop('checked'))
-							ajaxData[$(this).attr('name')] = $(this).val();
-					} else {
-						ajaxData[$(this).attr('name')] = $(this).val();
-					}
-				});
-			}
+			// if (submit) {
+			// 	this._lastSubmitName = submit.find(this.settings.submitIdentifier).val();
+			// 	submit.find(':input').each(function(){
+			// 		if ($(this).is(':checkbox')) {
+			// 			ajaxData[$(this).attr('name')] = $(this).prop('checked') ? 1 : 0;
+			// 		} else if ($(this).is(':radio')) {
+			// 			if ($(this).prop('checked'))
+			// 				ajaxData[$(this).attr('name')] = $(this).val();
+			// 		} else {
+			// 			ajaxData[$(this).attr('name')] = $(this).val();
+			// 		}
+			// 	});
+			// }
 
 			// We'll use an iframe as an ajax workaround if we're dealing with file uploads
-			if (submit && submit.attr('enctype') == 'multipart/form-data') {
+			// if (submit && submit.attr('enctype') == 'multipart/form-data') {
 
-				// Create a random ID for the new iframe
-				var iframeName = 'kTip-iframe'+Math.floor(Math.random()*99999);
+			// 	// Create a random ID for the new iframe
+			// 	var iframeName = 'kTip-iframe'+Math.floor(Math.random()*99999);
 
-				// Create the iframe
-				$('<iframe name="'+iframeName+'" id="'+iframeName+'" src="" style="display:none;"></iframe>')
-					.appendTo('body')
-					.bind('load', function(){
-						self.$trigger.removeClass(self.settings.loadingClass);
-						self.settings.onStopLoading.call(self);
+			// 	// Create the iframe
+			// 	$('<iframe name="'+iframeName+'" id="'+iframeName+'" src="" style="display:none;"></iframe>')
+			// 		.appendTo('body')
+			// 		.bind('load', function(){
+			// 			self.$trigger.removeClass(self.settings.loadingClass);
+			// 			self.settings.onStopLoading.call(self);
 
-						var response = $(this).contents().find('body').html();
-						// Is it a JSON object?
-						try {
-							var data = eval('('+response+')');
-							if (typeof data == 'object') {
-								self.settings.onJsonData.call(self, data);
-								return;
-							}
-						} catch (err) {}
-						// ... or just plain HTML?
-						self.setContent(response, modalContentChangeAnimation);
-					});
+			// 			var response = $(this).contents().find('body').html();
+			// 			// Is it a JSON object?
+			// 			try {
+			// 				var data = eval('('+response+')');
+			// 				if (typeof data == 'object') {
+			// 					self.settings.onJsonData.call(self, data);
+			// 					return;
+			// 				}
+			// 			} catch (err) {}
+			// 			// ... or just plain HTML?
+			// 			self.setContent(response, modalContentChangeAnimation);
+			// 		});
 
-				// Leave a visible copy of the form for usability reasons (we'll move the original)
-				submit.clone().insertAfter(submit);
+			// 	// Leave a visible copy of the form for usability reasons (we'll move the original)
+			// 	submit.clone().insertAfter(submit);
 
-				// Add ajaxData vars as hidden inputs
-				$.each(this.settings.ajaxData, function(name, value){
-					submit.append('<input type="hidden" name="'+name+'" value="'+value+'" />');
-				});
+			// 	// Add ajaxData vars as hidden inputs
+			// 	$.each(this.settings.ajaxData, function(name, value){
+			// 		submit.append('<input type="hidden" name="'+name+'" value="'+value+'" />');
+			// 	});
 
-				// Move form inside the iframe (Chrome had issues otherwise)
-				submit.appendTo($('#'+iframeName))
-					  .attr('action', this.settings.ajaxUrl || this.$trigger.attr('href'))
-					  .attr('target', iframeName)
-					  .append('<input type="hidden" name="is_iframe" value="true" />')
-					  .unbind('submit')
-					  .trigger('submit');
-			} else {
+			// 	// Move form inside the iframe (Chrome had issues otherwise)
+			// 	submit.appendTo($('#'+iframeName))
+			// 		  .attr('action', this.settings.ajaxUrl || this.$trigger.attr('href'))
+			// 		  .attr('target', iframeName)
+			// 		  .append('<input type="hidden" name="is_iframe" value="true" />')
+			// 		  .unbind('submit')
+			// 		  .trigger('submit');
+			// } else {
 				this._currentAjaxRequest = $.ajax({
-					url: this.settings.ajaxUrl || this.$trigger.attr('href'),
-					type: submit ? 'POST' : 'GET',
-					data: ajaxData,
+					type: 'GET',
+					url: url,
+					data: this.settings.ajax.data,
 					success: function(data){
-						self._currentAjaxRequest = null;
-						self.$trigger.removeClass(self.settings.loadingClass);
+						// self._currentAjaxRequest = null;
+						self.disableLoadingState();
 						self.settings.onStopLoading.call(self);
 
 						if (typeof data == 'object') {
@@ -602,31 +637,42 @@
 						}
 					},
 					error: function(jqXHR, textStatus, errorThrown){
-						self._currentAjaxRequest = null;
+						self.settings.onFailedRequest.call(self, jqXHR, textStatus, errorThrown);
+						// self._currentAjaxRequest = null;
 
-						if (textStatus !== 'abort') {
-							self.$trigger.removeClass(self.settings.loadingClass);
-							self.settings.onStopLoading.call(self);
-							self.setContent('<div class="notice alert">S\'ha produït un error</div>', modalContentChangeAnimation);
-						}
+						// if (textStatus !== 'abort') {
+						// 	self.$trigger.removeClass(self.settings.loadingClass);
+						// 	self.settings.onStopLoading.call(self);
+						// 	self.setContent('<div class="notice alert">S\'ha produït un error</div>', modalContentChangeAnimation);
+						// }
 					}
 				});
-			}
+			// }
 
-			if (this.$content)
-				this.setLoadingState();
+			// if (this.$content)
+			// 	this.setLoadingState();
 		},
 
 		setLoadingState: function() {
-			this.$content.find(':input').prop('disabled', true);
-			this.$content.find(':input, .kTip-loading-disabled').addClass(this.settings.disabledClass);
-			this.$content.find('.kTip-loading').show();
+			if (this.$trigger)
+				this.$trigger.addClass(this.settings.loadingClass);
+
+			if (this.$content) {
+				this.$content.find(':input').prop('disabled', true);
+				this.$content.find(':input, .kTip-loading-disabled').addClass(this.settings.disabledClass);
+				this.$content.find('.kTip-loading').show();
+			}
 		},
 
 		disableLoadingState: function() {
-			this.$content.find(':input').prop('disabled', false);
-			this.$content.find(':input, .kTip-loading-disabled').removeClass(this.settings.disabledClass);
-			this.$content.find('.kTip-loading').hide();
+			if (this.$trigger)
+				this.$trigger.removeClass(this.settings.loadingClass);
+
+			if (this.$content) {
+				this.$content.find(':input').prop('disabled', false);
+				this.$content.find(':input, .kTip-loading-disabled').removeClass(this.settings.disabledClass);
+				this.$content.find('.kTip-loading').hide();
+			}
 		},
 
 		setFocus: function() {
@@ -773,6 +819,58 @@
 			if (!this.isVisible())
 				return;
 
+			this.$content.stop();
+
+			//---[ Fix narrow blocks past body width ]------------------------//
+
+				modalContentChangeAnimation = modalContentChangeAnimation || {type: 'resize'};
+
+				if (!modalContentChangeAnimation.preHeight || !modalContentChangeAnimation.preWidth) {
+					modalContentChangeAnimation.preHeight = this.$content.height();
+					modalContentChangeAnimation.preWidth = this.$content.width();
+				}
+
+				if (!this.settings.css.height || !this.settings.css.width) {
+					if (!this._moveTimeout) {
+						var self = this;
+
+						// Create a temp container once every 200ms, to avoid browser
+						// slowness when scrolling
+						this._moveTimeout = setTimeout(function(){
+							self._moveTimeout = null;
+						}, 200);
+
+						var $tempContainer = this.$container.clone();
+
+						$tempContainer
+							.css({
+								left: 0,
+								top: 0,
+								visibility: 'hidden'
+							})
+							.find('.kTip-content')
+								.css({
+									height: this.settings.css.height || '',
+									width: this.settings.css.width || ''
+								})
+								.end()
+							.show()
+							.appendTo('body');
+
+						this.$content.css({
+							//height: $tempContainer.find('.kTip-content').height()
+							width: $tempContainer.find('.kTip-content').width()
+						});
+
+						$tempContainer.remove();
+					}
+				}
+
+				modalContentChangeAnimation.postHeight = this.$content.height();
+				modalContentChangeAnimation.postWidth = this.$content.width();
+
+			//---[ Call depending on display ]--------------------------------//
+
 			switch (this.settings.display) {
 				case 'modal':
 					this.moveModal(modalContentChangeAnimation);
@@ -791,21 +889,6 @@
 			    breatheSeparation = this.settings.breatheSeparation;
 
 			this.$container.css('padding', breatheSeparation+'px 0 '+(breatheSeparation*2)+'px');
-
-			modalContentChangeAnimation = modalContentChangeAnimation || {type: 'resize'};
-
-			if (!modalContentChangeAnimation.preHeight || !modalContentChangeAnimation.preWidth) {
-				modalContentChangeAnimation.preHeight = this.$content.height();
-				modalContentChangeAnimation.preWidth = this.$content.width();
-			}
-
-			this.$content.stop().css({
-				height: this.settings.css.height || '',
-				width: this.settings.css.width || ''
-			});
-
-			modalContentChangeAnimation.postHeight = this.$content.height();
-			modalContentChangeAnimation.postWidth = this.$content.width();
 
 			var containerHeight = this.$container.outerHeight(true),
 			    containerWidth = this.$container.outerWidth(true),
@@ -881,50 +964,11 @@
 
 		moveTooltip: function() {
 
-			var self = this;
-
-			//---[ Fix narrow blocks past body width ]----------------------------//
-
-				if (!this.settings.css.height || !this.settings.css.width) {
-
-					if (!this._moveTooltipTimeout) {
-
-						// Create a temp container once every 200ms, to avoid browser
-						// slowness when scrolling
-						this._moveTooltipTimeout = setTimeout(function(){
-							self._moveTooltipTimeout = null;
-						}, 200);
-
-						var $tempContainer = this.$container.clone();
-
-						$tempContainer
-							.css({
-								left: 0,
-								top: 0,
-								visibility: 'hidden'
-							})
-							.find('.kTip-content')
-								.css({
-									height: this.settings.css.height || '',
-									width: this.settings.css.width || ''
-								})
-								.end()
-							.show()
-							.appendTo('body');
-
-						this.$content.css({
-							//height: $tempContainer.find('.kTip-content').height()
-							width: $tempContainer.find('.kTip-content').width()
-						});
-
-						$tempContainer.remove();
-					}
-				}
-
 			//---[ Useful vars ]--------------------------------------------------//
 
 				var pos = {top: 0, left: 0},
-				    breatheSeparation = this.settings.breatheSeparation,
+				    breatheSeparation = this.settings.breatheSeparation
+				                      + this.settings.tooltip.arrowSize,
 				    windowHeight = $(window).height(),
 				    windowWidth = $(window).width(),
 				    containerHeight = this.$container.outerHeight(true),
