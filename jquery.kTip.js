@@ -12,6 +12,7 @@
  *   - Hide if trigger is hidden
  *   - Aware of z-index
  *   - Detect ajaxForm
+ *   - Tooltip left/right to top/bottom on mobile
  */
 
 (function($, window, undefined){
@@ -19,15 +20,24 @@
 //---[ jQuery plugin ]--------------------------------------------------------//
 
 	$.fn.kTip = function(defaultContent, options) {
-		var instance;
+		var instance,
+		    count = 0;
 		this.each(function(){
 			if ($(this).data('kTip')) {
 				instance = $(this).data('kTip');
 			} else {
+				count++;
 				$(this).data('kTip', kTip(this, defaultContent, options));
 			}
 		});
-		return instance || this;
+		// jQuery objects with only 1 element return either the instance or a
+		// jQuery chain. Multiple elements always return a jQuery chain.
+		// Eg:
+		//   $('#elem').kTip(); First call, returns jQuery
+		//   $('#elem').kTip(); Second call, returns kTip instance
+		//   $('.elements').kTip(); First call, returns jQuery
+		//   $('.elements').kTip(); Second call, returns jQuery
+		return (!instance || count > 1) ? this : instance;
 	};
 
 	$.expr[':'].kTip = function(elem) {
@@ -38,6 +48,7 @@
 
 	$.kTip = window.kTip = function(trigger, defaultContent, options) {
 
+		// Force instance: ktip(...) -> new kTip(...)
 		if (!(this instanceof kTip))
 			return new kTip(trigger, defaultContent, options);
 
@@ -76,6 +87,7 @@
 			extraClass: (options && options.display) ? 'kT-'+options.display : 'kT-tooltip',
 			activeClass: 'active',
 			loadingClass: 'loading',
+			disabledClass: 'disabled',
 			showDelay: (options && options.tooltip && options.tooltip.bind == 'hover') ? 200 : 0, // Show delay in ms
 			hideDelay: (options && options.tooltip && options.tooltip.bind == 'hover') ? 200 : 0, // Hide delay in ms
 			showSpeed: 300,
@@ -88,7 +100,7 @@
 			submitIdentifier: 'input[type="submit"]',
 			focusPriority: [
 				'[autofocus]:visible:enabled:first',
-				':not(:radio):input:visible:enabled:first'
+				':input:not(:radio):visible:enabled:first'
 			],
 			zIndexContainer: 999,
 			zIndexTooltipTrigger: 998,
@@ -212,8 +224,10 @@
 		open: function(delay) {
 			var self = this;
 			this._show = true;
-			delay ? setTimeout(function(){self._open()}, delay) : this._open(); // Using a delay value of `0` would still
-			                                                                    // create a noticeable visual effect
+			// Using a delay value of `0` would still
+			// create a noticeable visual effect
+			delay ? setTimeout(function(){self._open()}, delay)
+			      : this._open();
 		},
 
 		_open: function() {
@@ -230,17 +244,16 @@
 
 				var url = this.settings.ajaxUrl || this.$trigger.attr('href');
 
-				if (url && this._defaultContent && this._defaultContent.indexOf('kTip-preloader') >= 0) {
+				if (this._defaultContent) {
 					this.setContent(this._defaultContent);
-					setTimeout(function(){
-						self.$content.find('.kTip-preloader').attr('href', url).trigger('click');
-					}, this.settings.showSpeed);
-				} else if (this._defaultContent) {
-					this.setContent(this._defaultContent);
-				} else if (url.match(/\.(jpg|gif|png|bmp|jpeg)(.*)?$/i)) {
-					this.setContent('<img src="'+url+'" style="display:block;" />');
+				} else if (url) {
+					if (url.match(/\.(jpg|gif|png|bmp|jpeg)(.*)?$/i)) {
+						this.setContent('<img src="'+url+'" style="display:block;" />');
+					} else {
+						this.loadAjaxContent();
+					}
 				} else {
-					this.loadAjaxContent();
+					throw "kTip: no defaultContent or ajaxUrl provided.";
 				}
 			}
 			// Show existing content
@@ -252,7 +265,8 @@
 		close: function(delay) {
 			var self = this;
 			this._show = false;
-			delay ? setTimeout(function(){self._close()}, delay) : this._close();
+			delay ? setTimeout(function(){self._close()}, delay)
+			      : this._close();
 		},
 
 		_close: function() {
@@ -416,6 +430,7 @@
 					self.settings.onShow.call(self);
 				});
 			};
+
 			if (this.settings.overlay) {
 
 				var $overlay = $('#kTip-overlay');
@@ -603,12 +618,14 @@
 		},
 
 		setLoadingState: function() {
-			this.$content.find(':input').prop('disabled', true).addClass('disabled');
+			this.$content.find(':input').prop('disabled', true);
+			this.$content.find(':input, .kTip-loading-disabled').addClass(this.settings.disabledClass);
 			this.$content.find('.kTip-loading').show();
 		},
 
 		disableLoadingState: function() {
-			this.$content.find(':input').prop('disabled', false).removeClass('disabled');
+			this.$content.find(':input').prop('disabled', false);
+			this.$content.find(':input, .kTip-loading-disabled').removeClass(this.settings.disabledClass);
 			this.$content.find('.kTip-loading').hide();
 		},
 
