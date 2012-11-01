@@ -483,7 +483,7 @@
 					e.preventDefault();
 					self._lastSubmitName = $form.find(self.settings.submitIdentifier).val();
 					$form.ajaxSubmit({
-						url: $form.attr('action') || self.settings.ajax.url,
+						url: $form.attr('action') || self.settings.ajax.url || self.$trigger.attr('href'),
 						data: self.settings.ajax.data,
 						success: function(data) {
 							self.disableLoadingState();
