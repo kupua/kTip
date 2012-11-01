@@ -3,9 +3,10 @@
 <head>
 	<title>Tests - kTip</title>
 	<meta charset="utf-8" />
-	<link rel="stylesheet" href="kTip.css" />
+	<link rel="stylesheet" href="../kTip.css" />
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-	<script src="jquery.kTip.js"></script>
+	<script src="../jquery.kTip.js"></script>
+	<script src="jquery.form.js"></script>
 	<style>
 		* {
 			margin: 0;
@@ -75,19 +76,44 @@
 		<p><span class="button auto-trigger">Auto-trigger</span></p>
 		<p><span class="button block-close">Block close</span> <span class="button modal block-close">Block close</span></p>
 		<p><span class="button slow">Slow</span> <span class="button modal slow">Slow</span></p>
+		<p><span class="button modal grow">Grow</span></p>
+		<p><span class="button ajax-html">Ajax html</span> <span class="button modal ajax-html">Ajax html</span></p>
+		<p><span class="button ajax-json">Ajax json</span> <span class="button modal ajax-json">Ajax json</span></p>
+		<p><span class="button ajax-error">Ajax error</span> <span class="button modal ajax-error">Ajax error</span></p>
+		<p><span class="button default-form">Default form</span> <span class="button modal default-form">Default form</span></p>
+		<p><span class="button ajax-form">Ajax form</span> <span class="button modal ajax-form">Ajax form</span></p>
 	</div>
 
 <script>
 (function(){
 
+	/*$(document).on('submit', 'form', function(e){
+		e.preventDefault();
+		$(this).ajaxSubmit({
+			url: 'post.php',
+			dataType: 'json',
+			success: function(data) {
+				alert(data.message);
+			}
+			//target: 'myResultsDiv'
+		});
+	});*/
+
 	function test(selector, args) {
 		$(selector).each(function(){
 			var $elem = $(this);
 			if ($elem.hasClass('modal')) {
-				$elem.kTip.apply($elem, $.extend(true, [], [null, {display: 'modal', css: {padding: 30}}], args));
+				if (typeof args[0] == 'object') {
+					$elem.kTip.apply($elem, $.extend(true, [{display: 'modal', css: {padding: 30}}], args));
+				} else {
+					$elem.kTip.apply($elem, $.extend(true, [null, {display: 'modal', css: {padding: 30}}], args));
+				}
 			} else {
-				$elem.kTip.apply($elem, $.extend(true, [], [null, {css: {padding: 15}}], args));
-				$elem.kTip.apply($elem, args);
+				if (typeof args[0] == 'object') {
+					$elem.kTip.apply($elem, $.extend(true, [{css: {padding: 15}}], args));
+				} else {
+					$elem.kTip.apply($elem, $.extend(true, [null, {css: {padding: 15}}], args));
+				}
 			}
 		});
 	}
@@ -149,6 +175,58 @@
 			hideSpeed: 1000,
 			overlayShowSpeed: 1000,
 			overlayHideSpeed: 1000
+		}
+	]);
+
+	// Grow
+	$('.grow').on('click', function(){
+		alert("Not implemented :(");
+	});
+
+	// Ajax html
+	test('.ajax-html', [
+		{
+			ajax: {
+				url: 'ajax.html'
+			}
+		}
+	]);
+
+	// Ajax json
+	test('.ajax-json', [
+		{
+			ajax: {
+				url: 'ajax.json'
+			}
+		}
+	]);
+
+	// Ajax error
+	test('.ajax-error', [
+		{
+			ajax: {
+				url: 'ajax.error'
+			}
+		}
+	]);
+
+	// Default form
+	test('.default-form', [
+		'<form method="post" action="ajax.html">\
+			<input name="text" type="text" />\
+			<input type="submit" />\
+		</form>'
+	]);
+
+	// Ajax form
+	test('.ajax-form', [
+		{
+			ajax: {
+				url: 'form.php',
+				data: {
+					ajax: 'true'
+				}
+			}
 		}
 	]);
 
