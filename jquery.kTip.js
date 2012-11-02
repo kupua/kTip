@@ -521,6 +521,8 @@
 			this.$content.find('[class*="kTip-redirect"]').bind('click', function(e){
 				var $elem = $(this);
 
+				e.preventDefault();
+
 				// $elem.addClass(self.settings.loadingClass); // Why repeat? Already used in loadAjaxContent
 
 				var modalContentChangeAnimation = {};
@@ -537,10 +539,7 @@
 					}
 				}
 
-				self.settings.ajax.url = $elem.attr('href');
-				self.loadAjaxContent($elem.attr('href'), modalContentChangeAnimation);
-
-				e.preventDefault();
+				self.redirect($elem.attr('href'), modalContentChangeAnimation);
 			});
 			this.$content.find('.kTip-close').bind('click', function(e){
 				self.close();
@@ -554,6 +553,11 @@
 		// 		this._currentAjaxRequest = null;
 		// 	}
 		// },
+
+		redirect: function(url, modalContentChangeAnimation) {
+			this.settings.ajax.url = url;
+			this.loadAjaxContent(url, modalContentChangeAnimation);
+		},
 
 		loadAjaxContent: function(url, modalContentChangeAnimation) {
 
