@@ -49,8 +49,9 @@
 	$.kTip = window.kTip = function(trigger, defaultContent, options) {
 
 		// Force instance: ktip(...) -> new kTip(...)
-		if (!(this instanceof kTip))
+		if (!(this instanceof kTip)) {
 			return new kTip(trigger, defaultContent, options);
+		}
 
 		// trigger is optional when used only once. Eg: kTip("Hi!");
 		if (!trigger || !trigger.nodeType) {
@@ -213,8 +214,9 @@
 		}
 
 		// Auto-open if set
-		if (this.settings.auto)
+		if (this.settings.auto) {
 			this.open();
+		}
 	};
 
 //---[ kTip prototype ]-------------------------------------------------------//
@@ -240,8 +242,9 @@
 
 		_open: function() {
 
-			if (!this._show || this.isVisible())
+			if (!this._show || this.isVisible()) {
 				return;
+			}
 
 			var self = this;
 
@@ -279,8 +282,9 @@
 
 		_close: function() {
 
-			if (this._show || !this.isVisible() || this.settings.onBeforeClose.call(this) === false)
+			if (this._show || !this.isVisible() || this.settings.onBeforeClose.call(this) === false) {
 				return;
+			}
 
 			var self = this;
 
@@ -293,8 +297,9 @@
 
 				// If set to be destroyed, remove the content and bindings,
 				// and call onDestroy
-				if (self.settings.destroyOnClose)
+				if (self.settings.destroyOnClose) {
 					self.destroy();
+				}
 
 				if (self.settings.display == 'modal' && self.settings.overlay) {
 					self.$container.parent().hide();
@@ -325,8 +330,9 @@
 
 			var self = this;
 
-			if (!this.$container)
+			if (!this.$container) {
 				this.createElements();
+			}
 
 			if (this.settings.display == 'modal') {
 				modalContentChangeAnimation = modalContentChangeAnimation || {type: 'resize'};
@@ -404,8 +410,9 @@
 
 		showContainer: function() {
 
-			if (this.settings.onBeforeShow.call(this) === false)
+			if (this.settings.onBeforeShow.call(this) === false) {
 				return;
+			}
 
 			var self = this;
 
@@ -425,8 +432,9 @@
 			// Fade container in, and call onShow. If it's a modal, fade
 			// overlay in before
 			var fadeInContainer = function(){
-				if (self.settings.display == 'modal' && self.settings.overlay)
+				if (self.settings.display == 'modal' && self.settings.overlay) {
 					self.$container.parent().show();
+				}
 
 				// Set correct position before showing
 				self.$container.css('visibility', 'hidden').show();
@@ -658,8 +666,9 @@
 		},
 
 		setLoadingState: function() {
-			if (this.$trigger)
+			if (this.$trigger) {
 				this.$trigger.addClass(this.settings.loadingClass);
+			}
 
 			if (this.$content) {
 				this.$content.find(':input').prop('disabled', true);
@@ -669,8 +678,9 @@
 		},
 
 		disableLoadingState: function() {
-			if (this.$trigger)
+			if (this.$trigger) {
 				this.$trigger.removeClass(this.settings.loadingClass);
+			}
 
 			if (this.$content) {
 				this.$content.find(':input').prop('disabled', false);
@@ -681,16 +691,19 @@
 
 		setFocus: function() {
 
-			if (!this.settings.autoFocus)
+			if (!this.settings.autoFocus) {
 				return;
+			}
 
 			var form = this.$content.find(this.settings.submitIdentifier+'[value="'+this._lastSubmitName+'"]').parents('form:visible');
 
-			if (form.length == 0)
+			if (form.length == 0) {
 				form = this.$content.find('form:first:visible');
+			}
 
-			if (form.length == 0)
+			if (form.length == 0) {
 				form = this.$content;
+			}
 
 			for (var i = 0, firstInput = form.find(this.settings.focusPriority[i]);
 			     firstInput.length == 0 && i <= this.settings.focusPriority.length;
@@ -745,8 +758,9 @@
 				// Resize re-position
 				$(window).bind('resize', function(){self.moveContainer()});
 
-				if (this.settings.display == 'tooltip')
+				if (this.settings.display == 'tooltip') {
 					$(window).bind('scroll', function(){self.moveContainer()});
+				}
 
 				// Hide on outside click
 				if (this.settings.outsideClose) {
@@ -820,8 +834,9 @@
 
 		moveContainer: function(modalContentChangeAnimation) {
 
-			if (!this.isVisible())
+			if (!this.isVisible()) {
 				return;
+			}
 
 			this.$content.stop();
 
@@ -900,17 +915,22 @@
 			    wrapperWidth = $(window).width(),
 			    scrollTop = this.settings.overlay ? 0 : $(document).scrollTop();
 
-			if (this.settings.overlay)
+			if (this.settings.overlay) {
 				containerWidth += this._browserScrollbarWidth;
+			}
 
-			if (containerHeight < wrapperHeight)
+			if (containerHeight < wrapperHeight) {
 				top = scrollTop + ((wrapperHeight - containerHeight) / 2);
-			if (top < scrollTop)
+			}
+
+			if (top < scrollTop) {
 				top = scrollTop;
+			}
 
 			left = (wrapperWidth - containerWidth) / 2;
-			if (left < 0)
+			if (left < 0) {
 				left = 0;
+			}
 
 			switch (modalContentChangeAnimation.type) {
 
@@ -993,17 +1013,21 @@
 
 				if (this.settings.tooltip.fit) {
 
-					if (position == 'bottom' && windowHeight < (sourceOffset.top - scrollTop + sourceHeight + containerHeight + breatheSeparation))
+					if (position == 'bottom' && windowHeight < (sourceOffset.top - scrollTop + sourceHeight + containerHeight + breatheSeparation)) {
 						position = 'top';
+					}
 
-					if (position == 'top' && (sourceOffset.top - scrollTop - breatheSeparation) < containerHeight)
+					if (position == 'top' && (sourceOffset.top - scrollTop - breatheSeparation) < containerHeight) {
 						position = 'bottom';
+					}
 
-					if (position == 'right' && windowWidth < (sourceOffset.left - scrollLeft + sourceWidth + containerWidth + breatheSeparation))
+					if (position == 'right' && windowWidth < (sourceOffset.left - scrollLeft + sourceWidth + containerWidth + breatheSeparation)) {
 						position = 'left';
+					}
 
-					if (position == 'left' && (sourceOffset.left - scrollLeft - breatheSeparation) < containerWidth)
+					if (position == 'left' && (sourceOffset.left - scrollLeft - breatheSeparation) < containerWidth) {
 						position = 'right';
+					}
 				}
 
 			//---[ Position ]-----------------------------------------------------//
@@ -1075,25 +1099,35 @@
 					while ((pos[posFit.pos] - posFit.scroll + posFit.container + breatheSeparation) > posFit.window) {
 						move = false;
 						if (posFit.container >= posFit.source) {
-							if ((pos[posFit.pos] + posFit.container) > (posFit.sourceOffset + posFit.source))
+							if ((pos[posFit.pos] + posFit.container) > (posFit.sourceOffset + posFit.source)) {
 								move = true;
-						} else {
-							if (pos[posFit.pos] > posFit.sourceOffset)
-								move = true;
+							}
+						} else if (pos[posFit.pos] > posFit.sourceOffset) {
+							move = true;
 						}
-						if (move) pos[posFit.pos]--; else break;
+
+						if (move) {
+							pos[posFit.pos]--;
+						} else {
+							break;
+						}
 					}
 
 					while ((pos[posFit.pos] - posFit.scroll) < breatheSeparation) {
 						move = false;
 						if (posFit.container >= posFit.source) {
-							if (pos[posFit.pos] < posFit.sourceOffset)
+							if (pos[posFit.pos] < posFit.sourceOffset) {
 								move = true;
-						} else {
-							if ((pos[posFit.pos] + posFit.container) < (posFit.sourceOffset + posFit.source))
-								move = true;
+							}
+						} else if ((pos[posFit.pos] + posFit.container) < (posFit.sourceOffset + posFit.source)) {
+							move = true;
 						}
-						if (move) pos[posFit.pos]++; else break;
+
+						if (move) {
+							pos[posFit.pos]++;
+						} else {
+							break;
+						}
 					}
 
 					if (arrowSize && posFit.source < (arrowSize + arrowDistance*2)) {
@@ -1110,8 +1144,9 @@
 							}
 							arrowSeparationTop = posFit.sourceOffset + (posFit.source / 2) - arrowSize - pos[posFit.pos];
 						    arrowSeparationBottom = pos[posFit.pos] + posFit.container - posFit.sourceOffset - (posFit.source / 2) - arrowSize;
-							if (arrowSeparationTop < arrowDistance || arrowSeparationBottom < arrowDistance)
+							if (arrowSeparationTop < arrowDistance || arrowSeparationBottom < arrowDistance) {
 								pos[posFit.pos] = posFit.sourceOffset - ((posFit.container - (arrowSize * 2)) / 2);
+							}
 						}
 					}
 				}
@@ -1119,8 +1154,9 @@
 			//---[ Arrow ]--------------------------------------------------------//
 
 				if (arrowSize) {
-					if (!this.$tooltipArrow)
+					if (!this.$tooltipArrow) {
 						this.createElements();
+					}
 
 					this.$tooltipArrow.show();
 
