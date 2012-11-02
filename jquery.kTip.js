@@ -1,5 +1,5 @@
 /**
- * kTip 0.0.3
+ * kTip 0.0.4
  * Based on mgExternal 1.0.30
  *
  * Copyright 2012 Ricard Osorio Mañanas
@@ -13,6 +13,8 @@
  *   - Aware of z-index
  *   - Detect ajaxForm
  *   - Tooltip left/right to top/bottom on mobile
+ *   - Cancel ajax requests on close (including file uploads), but don't call
+ *     onFailedRequest? Or do?
  */
 
 (function($, window, undefined){
@@ -167,7 +169,7 @@
 		this._lastSubmitName = null;
 		this._show = false;
 		this._triggerZIndexBackup = null;
-		this._preventNextClick = false;
+		this._preventNextMouseup = false;
 		this._moveTimeout = null;
 		// this._currentAjaxRequest = null;
 
@@ -198,14 +200,14 @@
 							this.$trigger.bind({
 								mouseenter: function(){self.open(self.settings.showDelay)},
 								mouseleave: function(){self.close(self.settings.hideDelay)},
-								click: function(e){e.stopPropagation()}
+								mouseup: function(e){e.stopPropagation()}
 							});
 							break;
 						case 'focus':
 							this.$trigger.bind({
 								focus: function(){self.open(self.settings.showDelay)},
 								blur: function(){self.close(self.settings.hideDelay)},
-								click: function(e){e.stopPropagation()}
+								mouseup: function(e){e.stopPropagation()}
 							});
 							break;
 					}
@@ -348,26 +350,26 @@
 			this.$content
 				.html(html)
 				.css({
-					left: 0,
-					top: 0,
-					position: 'absolute',
+					// left: 0,
+					// top: 0,
+					// position: 'absolute',
 					visibility: 'hidden'
 				})
 				// We remove the margin for the first DIV element due to aesthetical
 				// reasons. If you wish to maintain those proportions, you should set
 				// the equivalent padding in settings.css
-				.children()
-					.css({
-						marginLeft: 0,
-						marginRight: 0
-					})
-					.first()
-						.css('margin-top', '0')
-						.end()
-					.last()
-						.css('margin-bottom', '0')
-						.end()
-					.end()
+				// .children()
+				// 	.css({
+				// 		marginLeft: 0,
+				// 		marginRight: 0
+				// 	})
+				// 	.first()
+				// 		.css('margin-top', '0')
+				// 		.end()
+				// 	.last()
+				// 		.css('margin-bottom', '0')
+				// 		.end()
+				// 	.end()
 				.appendTo('body');
 
 			this.bindSpecialActions();
@@ -375,9 +377,9 @@
 
 			var proceed = function() {
 				self.$content.css({
-					left: '',
-					top: '',
-					position: '',
+					// left: '',
+					// top: '',
+					// position: '',
 					visibility: ''
 				});
 
@@ -387,7 +389,7 @@
 
 				if (self.isVisible() && self.$container.css('opacity') == 1) {
 					self.setFocus();
-					return self.moveContainer(modalContentChangeAnimation);
+					return self.moveContainer(modalContentChangeAnimation, true);
 				} else {
 					self.showContainer();
 				}
@@ -485,14 +487,14 @@
 
 			var self = this;
 
+			// File uploads don't work on IE. MUST FIX
 			if (this.settings.ajax.handleForms && $.fn.ajaxSubmit) {
 				this.$content.find('form').bind('submit', function(e){
 					var $form = $(this);
 					e.preventDefault();
 					self._lastSubmitName = $form.find(self.settings.submitIdentifier).val();
-					$form.ajaxSubmit({
+					$form.ajaxSubmit($.extend(true, {}, {
 						url: $form.attr('action') || self.settings.ajax.url || self.$trigger.attr('href'),
-						data: self.settings.ajax.data,
 						success: function(data) {
 							self.disableLoadingState();
 							self.settings.onStopLoading.call(self);
@@ -506,7 +508,7 @@
 						error: function(jqXHR, textStatus, errorThrown){
 							self.settings.onFailedRequest.call(self, jqXHR, textStatus, errorThrown);
 						}
-					});
+					}, self.settings.ajax, $form.data('kTip-ajax')));
 					self.setLoadingState(); // After submit as we are disabling all input fields
 				});
 			}
@@ -633,7 +635,7 @@
 			// 		  .unbind('submit')
 			// 		  .trigger('submit');
 			// } else {
-				this._currentAjaxRequest = $.ajax({
+				$.ajax({
 					type: 'GET',
 					url: url,
 					data: this.settings.ajax.data,
@@ -741,9 +743,9 @@
 							})
 							.appendTo('body')
 						: 'body')
-					.bind('click', function(e){
+					.bind('mouseup', function(e){
 						// Required if outsideClose is set to true
-						self._preventNextClick = true;
+						self._preventNextMouseup = true;
 					});
 
 				this.$content = $('<div/>')
@@ -768,12 +770,12 @@
 
 					// Using body instead of document as clicking on the sidebar
 					// would trigger the event.
-					$('body').bind('click', function(e){
+					$('body').bind('mouseup', function(e){
 						// tooltip bind == 'click' gives problems in certain situations
 						// (showSpeed == 0 && hideSpeed == 0)
 						if (!self.$trigger.is(e.target) && !self.$trigger.find(e.target).length) {
-							if (self._preventNextClick) {
-								self._preventNextClick = false;
+							if (self._preventNextMouseup) {
+								self._preventNextMouseup = false;
 							} else if (e.which == 1 && self.isVisible()) {
 								self.close();
 							}
@@ -833,7 +835,7 @@
 			}
 		},
 
-		moveContainer: function(modalContentChangeAnimation) {
+		moveContainer: function(modalContentChangeAnimation, force) {
 
 			if (!this.isVisible()) {
 				return;
@@ -851,7 +853,7 @@
 				}
 
 				if (!this.settings.css.height || !this.settings.css.width) {
-					if (!this._moveTimeout) {
+					if (force || !this._moveTimeout) {
 						var self = this;
 
 						// Create a temp container once every 200ms, to avoid browser
