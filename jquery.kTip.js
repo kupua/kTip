@@ -1,5 +1,5 @@
 /**
- * kTip 0.0.1
+ * kTip 0.0.2
  * Based on mgExternal 1.0.30
  *
  * Copyright 2012 Ricard Osorio Mañanas
