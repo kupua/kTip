@@ -1,5 +1,5 @@
 /**
- * kTip 0.0.2
+ * kTip 0.0.3
  * Based on mgExternal 1.0.30
  *
  * Copyright 2012 Ricard Osorio Mañanas
@@ -720,6 +720,7 @@
 
 			if (!this.$container) {
 				this.$container = $('<div/>')
+					.data('kTip', this)
 					.addClass('kTip-container')
 					.addClass(this.settings.extraClass)
 					.css({
