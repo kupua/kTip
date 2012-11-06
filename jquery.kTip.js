@@ -1,5 +1,5 @@
 /**
- * kTip 0.0.5
+ * kTip 0.0.6
  * Based on mgExternal 1.0.30
  *
  * Copyright 2012 Ricard Osorio Mañanas
@@ -172,6 +172,7 @@
 		this._preventNextMousedown = false;
 		this._moveTimeout = null;
 		// this._currentAjaxRequest = null;
+		this._registeredChildren = [];
 
 		// Set trigger bindings
 		if (this.$trigger) {
@@ -228,6 +229,10 @@
 		defaults: {},
 
 		_browserScrollbarWidth: 17, // Default value, will be updated when DOM is ready
+
+		registerChild: function(childInstance) {
+			this._registeredChildren.push(childInstance);
+		},
 
 		isVisible: function() {
 			return !!this.$container && this.$container.is(':visible');
@@ -778,13 +783,27 @@
 					// select usually starts inside but ends outside, closing
 					// the container).
 					$('body').bind('mousedown', function(e){
-						// tooltip bind == 'click' gives problems in certain situations
-						// (showSpeed == 0 && hideSpeed == 0)
-						if (!self.$trigger.is(e.target) && !self.$trigger.find(e.target).length) {
-							if (self._preventNextMousedown) {
-								self._preventNextMousedown = false;
-							} else if (e.which == 1 && self.isVisible()) {
-								self.close();
+						// Detect if the target is inside a kTip container. If
+						// it is, check if the instance has been registered as
+						// a child.
+						var isChild = false,
+						    parentInstance = $(e.target).parents('.kTip-container').data('kTip');
+
+						$.each(self._registeredChildren, function(key, instance){
+							if (instance === parentInstance) {
+								isChild = true;
+							}
+						});
+
+						if (!isChild) {
+							// tooltip bind == 'click' gives problems in certain situations
+							// (showSpeed == 0 && hideSpeed == 0)
+							if (!self.$trigger.is(e.target) && !self.$trigger.find(e.target).length) {
+								if (self._preventNextMousedown) {
+									self._preventNextMousedown = false;
+								} else if (e.which == 1 && self.isVisible()) {
+									self.close();
+								}
 							}
 						}
 					});
