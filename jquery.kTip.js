@@ -1,5 +1,5 @@
 /**
- * kTip 0.0.7
+ * kTip 0.0.8
  * Based on mgExternal 1.0.30
  *
  * Copyright 2012 Ricard Osorio Mañanas
@@ -793,11 +793,12 @@
 						// it is, check if the instance has been registered as
 						// a child.
 						var targetIsChild = false,
-						    parentInstance = $(e.target).parents('.kTip-container').data('kTip');
+						    parentInstance = $(e.target).data('kTip') // Click has been done directly to the container
+						                  || $(e.target).parents('.kTip-container').data('kTip');
 
 						$.each(self._registeredChildren, function(key, instance){
-							if (targetIsChild === parentInstance) {
-								isChild = true;
+							if (instance === parentInstance) {
+								targetIsChild = true;
 							}
 						});
 
