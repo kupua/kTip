@@ -1,5 +1,5 @@
 /**
- * kTip 0.0.6
+ * kTip 0.0.7
  * Based on mgExternal 1.0.30
  *
  * Copyright 2012 Ricard Osorio Mañanas
@@ -169,10 +169,11 @@
 		this._lastSubmitName = null;
 		this._show = false;
 		this._triggerZIndexBackup = null;
-		this._preventNextMousedown = false;
+		this._preventNextMouseup = false;
 		this._moveTimeout = null;
 		// this._currentAjaxRequest = null;
 		this._registeredChildren = [];
+		this._lastMousedownOutside;
 
 		// Set trigger bindings
 		if (this.$trigger) {
@@ -201,14 +202,16 @@
 							this.$trigger.bind({
 								mouseenter: function(){self.open(self.settings.showDelay)},
 								mouseleave: function(){self.close(self.settings.hideDelay)},
-								mousedown: function(e){e.stopPropagation()}
+								mousedown: function(e){e.stopPropagation()},
+								mouseup: function(e){e.stopPropagation()}
 							});
 							break;
 						case 'focus':
 							this.$trigger.bind({
 								focus: function(){self.open(self.settings.showDelay)},
 								blur: function(){self.close(self.settings.hideDelay)},
-								mousedown: function(e){e.stopPropagation()}
+								mousedown: function(e){e.stopPropagation()},
+								mouseup: function(e){e.stopPropagation()}
 							});
 							break;
 					}
@@ -752,9 +755,9 @@
 							})
 							.appendTo('body')
 						: 'body')
-					.bind('mousedown', function(e){
+					.bind('mouseup', function(e){
 						// Required if outsideClose is set to true
-						self._preventNextMousedown = true;
+						self._preventNextMouseup = true;
 					});
 
 				this.$content = $('<div/>')
@@ -777,33 +780,43 @@
 				// Hide on outside click
 				if (this.settings.outsideClose) {
 
-					// Using body instead of document as clicking on the sidebar
-					// would trigger the event. Also using mousedown as we want
-					// to track where the click _starts_, not ends (ie, a text
-					// select usually starts inside but ends outside, closing
-					// the container).
-					$('body').bind('mousedown', function(e){
+					// `mousedown` event fires everytime, even when the clicking
+					// a scrollbar. We don't want to close on scrollbar click,
+					// so we should use `mouseup` (`click` gives problems
+					// sometimes). Problem is, when some selects a text, the
+					// mousedown starts inside the container, but sometimes ends
+					// outside. We also don't want to close in that circumstance.
+					// So here we are, tracking where the clicking starts...
+
+					$('body').on('mousedown', function(e){
 						// Detect if the target is inside a kTip container. If
 						// it is, check if the instance has been registered as
 						// a child.
-						var isChild = false,
+						var targetIsChild = false,
 						    parentInstance = $(e.target).parents('.kTip-container').data('kTip');
 
 						$.each(self._registeredChildren, function(key, instance){
-							if (instance === parentInstance) {
+							if (targetIsChild === parentInstance) {
 								isChild = true;
 							}
 						});
 
-						if (!isChild) {
-							// tooltip bind == 'click' gives problems in certain situations
-							// (showSpeed == 0 && hideSpeed == 0)
-							if (!self.$trigger.is(e.target) && !self.$trigger.find(e.target).length) {
-								if (self._preventNextMousedown) {
-									self._preventNextMousedown = false;
-								} else if (e.which == 1 && self.isVisible()) {
-									self.close();
-								}
+						if (!targetIsChild && !self.$container.is(e.target) && !self.$container.find(e.target).length) {
+							self._lastMousedownOutside = true;
+						} else {
+							self._lastMousedownOutside = false;
+						}
+					});
+
+					// ...and here closing when it started outside. Tada!
+					// Also: using body instead of document as clicking on the
+					// sidebar would trigger the event.
+					$('body').bind('mouseup', function(e){
+						if (self._lastMousedownOutside) {
+							if (self._preventNextMousedown) {
+								self._preventNextMousedown = false;
+							} else if (e.which == 1 && self.isVisible()) {
+								self.close();
 							}
 						}
 					});
