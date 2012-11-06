@@ -1,5 +1,5 @@
 /**
- * kTip 0.0.4
+ * kTip 0.0.5
  * Based on mgExternal 1.0.30
  *
  * Copyright 2012 Ricard Osorio Mañanas
@@ -169,7 +169,7 @@
 		this._lastSubmitName = null;
 		this._show = false;
 		this._triggerZIndexBackup = null;
-		this._preventNextMouseup = false;
+		this._preventNextMousedown = false;
 		this._moveTimeout = null;
 		// this._currentAjaxRequest = null;
 
@@ -200,14 +200,14 @@
 							this.$trigger.bind({
 								mouseenter: function(){self.open(self.settings.showDelay)},
 								mouseleave: function(){self.close(self.settings.hideDelay)},
-								mouseup: function(e){e.stopPropagation()}
+								mousedown: function(e){e.stopPropagation()}
 							});
 							break;
 						case 'focus':
 							this.$trigger.bind({
 								focus: function(){self.open(self.settings.showDelay)},
 								blur: function(){self.close(self.settings.hideDelay)},
-								mouseup: function(e){e.stopPropagation()}
+								mousedown: function(e){e.stopPropagation()}
 							});
 							break;
 					}
@@ -492,6 +492,10 @@
 				this.$content.find('form').bind('submit', function(e){
 					var $form = $(this);
 					e.preventDefault();
+					// if ($form.attr('enctype') == 'multipart/form-data' || $form.find('input[type="file"]').length) {
+					// 	alert("File uploads are discouraged in the current version of kTip. Please provide support through an external plugin.");
+					// 	return;
+					// }
 					self._lastSubmitName = $form.find(self.settings.submitIdentifier).val();
 					$form.ajaxSubmit($.extend(true, {}, {
 						url: $form.attr('action') || self.settings.ajax.url || self.$trigger.attr('href'),
@@ -743,9 +747,9 @@
 							})
 							.appendTo('body')
 						: 'body')
-					.bind('mouseup', function(e){
+					.bind('mousedown', function(e){
 						// Required if outsideClose is set to true
-						self._preventNextMouseup = true;
+						self._preventNextMousedown = true;
 					});
 
 				this.$content = $('<div/>')
@@ -769,13 +773,16 @@
 				if (this.settings.outsideClose) {
 
 					// Using body instead of document as clicking on the sidebar
-					// would trigger the event.
-					$('body').bind('mouseup', function(e){
+					// would trigger the event. Also using mousedown as we want
+					// to track where the click _starts_, not ends (ie, a text
+					// select usually starts inside but ends outside, closing
+					// the container).
+					$('body').bind('mousedown', function(e){
 						// tooltip bind == 'click' gives problems in certain situations
 						// (showSpeed == 0 && hideSpeed == 0)
 						if (!self.$trigger.is(e.target) && !self.$trigger.find(e.target).length) {
-							if (self._preventNextMouseup) {
-								self._preventNextMouseup = false;
+							if (self._preventNextMousedown) {
+								self._preventNextMousedown = false;
 							} else if (e.which == 1 && self.isVisible()) {
 								self.close();
 							}
