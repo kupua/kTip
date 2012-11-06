@@ -1,5 +1,5 @@
 /**
- * kTip 0.0.8
+ * kTip 0.0.9
  * Based on mgExternal 1.0.30
  *
  * Copyright 2012 Ricard Osorio Mañanas
@@ -15,6 +15,8 @@
  *   - Tooltip left/right to top/bottom on mobile
  *   - Cancel ajax requests on close (including file uploads), but don't call
  *     onFailedRequest? Or do?
+ *   - Have separate overlays and be aware of z-indexes when using children
+ *     (also ability to have 0 opacity modals over parent modals)
  */
 
 (function($, window, undefined){
@@ -161,6 +163,7 @@
 		this.$trigger = $(trigger);
 		this.$container = null;
 		this.$content = null;
+		this.$overlay = null;
 		this.$tooltipArrow = null;
 
 		// Private vars
@@ -318,7 +321,7 @@
 						overflow: ''
 					});
 					self.settings.modal.onRestoreScroll.call(self);
-					$('#kTip-overlay').fadeOut(self.settings.overlayHideSpeed, function(){
+					self.$overlay.fadeOut(self.settings.overlayHideSpeed, function(){
 						self.settings.onClose.call(self);
 					});
 				} else {
@@ -327,7 +330,7 @@
 			});
 
 			if (this.settings.display == 'tooltip' && this.settings.overlay) {
-				$('#kTip-overlay').fadeOut(this.settings.overlayHideSpeed, function(){
+				this.$overlay.fadeOut(this.settings.overlayHideSpeed, function(){
 					self.$trigger.css({
 						position: self._triggerZIndexBackup.position,
 						zIndex: self._triggerZIndexBackup.zIndex
@@ -458,22 +461,15 @@
 			};
 
 			if (this.settings.overlay) {
-
-				var $overlay = $('#kTip-overlay');
-				$overlay.css({
-					background: this.settings.overlayColor,
-					opacity: this.settings.overlayOpacity
-				});
-
 				if (this.settings.display == 'modal') {
 					$('body').css({
 						marginRight: this._browserScrollbarWidth,
 						overflow: 'hidden'
 					});
 					this.settings.modal.onDisableScroll.call(this);
-					$overlay.fadeIn(this.settings.overlayShowSpeed, fadeInContainer);
+					this.$overlay.fadeIn(this.settings.overlayShowSpeed, fadeInContainer);
 				} else {
-					$overlay.fadeIn(this.settings.overlayShowSpeed);
+					this.$overlay.fadeIn(this.settings.overlayShowSpeed);
 					fadeInContainer();
 				}
 			} else {
@@ -744,6 +740,7 @@
 					.hide()
 					.appendTo(this.settings.display == 'modal' && this.settings.overlay
 						? $('<div/>')
+							.data('kTip', this) // Used to detect children
 							.css({
 								height: '100%',
 								left: 0,
@@ -834,12 +831,15 @@
 				self.settings.onCreateElements.call(self);
 			}
 
-			if (this.settings.overlay && $('#kTip-overlay').length == 0) {
-				$('<div/>')
-					.attr('id', 'kTip-overlay')
+			if (this.settings.overlay && !this.$overlay) {
+				this.$overlay = $('<div/>')
+					.data('kTip', this) // Used to detect children
+					.attr('class', 'kTip-overlay')
 					.css({
+						background: this.settings.overlayColor,
 						height: '100%', // 100% doesn't work properly on touchscreens
 						left: 0,
+						opacity: this.settings.overlayOpacity,
 						position: 'fixed',
 						top: 0,
 						width: '100%', // 100% doesn't work properly on touchscreens
