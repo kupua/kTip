@@ -1,5 +1,5 @@
 /**
- * kTip 0.0.9
+ * kTip 0.0.10
  * Based on mgExternal 1.0.30
  *
  * Copyright 2012 Ricard Osorio Mañanas
@@ -17,6 +17,8 @@
  *     onFailedRequest? Or do?
  *   - Have separate overlays and be aware of z-indexes when using children
  *     (also ability to have 0 opacity modals over parent modals)
+ *   - When two overlays are opened at the same time, the first one to close
+ *     restores the body CSS, leaving 2 scrollbars
  */
 
 (function($, window, undefined){
@@ -823,7 +825,13 @@
 				// Hide on ESC press
 				if (this.settings.escClose) {
 					$(document).bind('keyup', function(e){
-						if (e.keyCode == 27)
+						var childOpen = false;
+						$.each(self._registeredChildren, function(key, instance){
+							if (instance.isVisible()) {
+								childOpen = true;
+							}
+						});
+						if (!childOpen && e.keyCode == 27)
 							self.close();
 					});
 				}
