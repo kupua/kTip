@@ -1,5 +1,5 @@
 /**
- * kTip 0.0.10
+ * kTip 0.0.11
  * Based on mgExternal 1.0.30
  *
  * Copyright 2012 Ricard Osorio Mañanas
@@ -116,7 +116,7 @@
 
 			// Ajax built-in functionality
 			ajax: {
-				url: null, // URL to fetch data from (if no defaultContent is provided or a form is sent)
+				url: undefined, // URL to fetch data from (if no defaultContent is provided or a form is sent)
 				data: {}, // Additional arguments to be sent
 				handleForms: true // Depends on the existence of the jQuery Form Plugin (https://github.com/malsup/form)
 			},
@@ -136,7 +136,7 @@
 				distance: 0,
 				arrowSize: 8, // Arrow size in pixels
 				arrowDistance: 15,
-				arrowFrontColor: null,
+				arrowFrontColor: undefined,
 				fit: true
 			},
 
@@ -503,7 +503,7 @@
 					// 	return;
 					// }
 					self._lastSubmitName = $form.find(self.settings.submitIdentifier).val();
-					$form.ajaxSubmit($.extend(true, {}, {
+					$form.ajaxSubmit($.extend(true, {}, self.settings.ajax, $form.data('kTip-ajax'), {
 						url: $form.attr('action') || self.settings.ajax.url || self.$trigger.attr('href'),
 						success: function(data) {
 							self.disableLoadingState();
@@ -518,7 +518,7 @@
 						error: function(jqXHR, textStatus, errorThrown){
 							self.settings.onFailedRequest.call(self, jqXHR, textStatus, errorThrown);
 						}
-					}, self.settings.ajax, $form.data('kTip-ajax')));
+					}));
 					self.setLoadingState(); // After submit as we are disabling all input fields
 				});
 			}
@@ -645,10 +645,9 @@
 			// 		  .unbind('submit')
 			// 		  .trigger('submit');
 			// } else {
-				$.ajax({
+				$.ajax($.extend(true, {}, self.settings.ajax, {
 					type: 'GET',
 					url: url,
-					data: this.settings.ajax.data,
 					success: function(data){
 						// self._currentAjaxRequest = null;
 						self.disableLoadingState();
@@ -670,7 +669,7 @@
 						// 	self.setContent('<div class="notice alert">S\'ha produït un error</div>', modalContentChangeAnimation);
 						// }
 					}
-				});
+				}));
 			// }
 
 			// if (this.$content)
