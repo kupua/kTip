@@ -1,5 +1,5 @@
 /**
- * kTip 0.0.12
+ * kTip 0.0.13
  * Based on mgExternal 1.0.30
  *
  * Copyright 2012 Ricard Osorio Mañanas
@@ -177,7 +177,6 @@
 		this._preventNextMouseup = false;
 		this._moveTimeout = null;
 		// this._currentAjaxRequest = null;
-		this._registeredChildren = [];
 		this._lastMousedownOutside;
 
 		// Set trigger bindings
@@ -237,10 +236,6 @@
 		defaults: {},
 
 		_browserScrollbarWidth: 17, // Default value, will be updated when DOM is ready
-
-		registerChild: function(childInstance) {
-			this._registeredChildren.push(childInstance);
-		},
 
 		isVisible: function() {
 			return !!this.$container && this.$container.is(':visible');
