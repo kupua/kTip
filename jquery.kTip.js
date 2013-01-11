@@ -1,5 +1,5 @@
 /**
- * kTip 0.0.11
+ * kTip 0.0.12
  * Based on mgExternal 1.0.30
  *
  * Copyright 2012 Ricard Osorio Mañanas
@@ -246,6 +246,22 @@
 			return !!this.$container && this.$container.is(':visible');
 		},
 
+		areAllChildrenClosed: function() {
+
+			// Find children that have kTip instances. If they are open, let
+			// them decide about their own children (don't do recursive search)
+
+			var allChildrenClosed = true;
+
+			this.$content.find(':kTip').each(function(){
+				if ($(this).kTip().isVisible()) {
+					allChildrenClosed = false;
+				}
+			});
+
+			return allChildrenClosed;
+		},
+
 		open: function(delay) {
 			var self = this;
 			this._show = true;
@@ -339,11 +355,14 @@
 					});
 				});
 			}
+
+			// Close opened children
+			this.$content.find(':kTip').each(function(){
+				$(this).kTip().close();
+			});
 		},
 
 		setContent: function(html, modalContentChangeAnimation) {
-
-			var self = this;
 
 			if (!this.$container) {
 				this.createElements();
@@ -388,39 +407,23 @@
 			this.bindSpecialActions();
 			this.settings.onContentReady.call(this);
 
-			var proceed = function() {
-				self.$content.css({
-					// left: '',
-					// top: '',
-					// position: '',
-					visibility: ''
-				});
+			this.$content.css({
+				// left: '',
+				// top: '',
+				// position: '',
+				visibility: ''
+			});
 
-				self.$content.appendTo(self.$container);
+			this.$content.appendTo(this.$container);
 
-				$dummyContent.remove();
+			$dummyContent.remove();
 
-				if (self.isVisible() && self.$container.css('opacity') == 1) {
-					self.setFocus();
-					return self.moveContainer(modalContentChangeAnimation, true);
-				} else {
-					self.showContainer();
-				}
-			}
-
-			proceed();
-
-			/*var $images = this.$content.find('img');
-
-			if ($images.length) {
-				var loadedImages = 0;
-				$images.on('load', function(){
-					if (++loadedImages >= $images.length)
-						proceed();
-				});
+			if (this.isVisible() && this.$container.css('opacity') == 1) {
+				this.setFocus();
+				return this.moveContainer(modalContentChangeAnimation, true);
 			} else {
-				proceed();
-			}*/
+				this.showContainer();
+			}
 		},
 
 		showContainer: function() {
@@ -787,20 +790,7 @@
 					// So here we are, tracking where the clicking starts...
 
 					$('body').on('mousedown', function(e){
-						// Detect if the target is inside a kTip container. If
-						// it is, check if the instance has been registered as
-						// a child.
-						var targetIsChild = false,
-						    parentInstance = $(e.target).data('kTip') // Click has been done directly to the container
-						                  || $(e.target).parents('.kTip-container').data('kTip');
-
-						$.each(self._registeredChildren, function(key, instance){
-							if (instance === parentInstance) {
-								targetIsChild = true;
-							}
-						});
-
-						if (!targetIsChild && !self.$container.is(e.target) && !self.$container.find(e.target).length) {
+						if (self.areAllChildrenClosed() && !self.$container.is(e.target) && !self.$container.find(e.target).length) {
 							self._lastMousedownOutside = true;
 						} else {
 							self._lastMousedownOutside = false;
@@ -824,14 +814,9 @@
 				// Hide on ESC press
 				if (this.settings.escClose) {
 					$(document).bind('keyup', function(e){
-						var childOpen = false;
-						$.each(self._registeredChildren, function(key, instance){
-							if (instance.isVisible()) {
-								childOpen = true;
-							}
-						});
-						if (!childOpen && e.keyCode == 27)
+						if (e.keyCode == 27 && self.isVisible() && self.areAllChildrenClosed()) {
 							self.close();
+						}
 					});
 				}
 
