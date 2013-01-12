@@ -22,7 +22,7 @@
 
 (function($, window, undefined){
 
-//---[ jQuery plugin ]--------------------------------------------------------//
+	//---[ jQuery plugin ]----------------------------------------------------//
 
 	$.fn.kTip = function(defaultContent, options) {
 		var instance,
@@ -49,7 +49,7 @@
 		return !!$(elem).data('kTip');
 	};
 
-//---[ kTip constructor ]-----------------------------------------------------//
+	//---[ kTip constructor ]-------------------------------------------------//
 
 	$.kTip = window.kTip = function(trigger, defaultContent, options) {
 
@@ -228,7 +228,7 @@
 		}
 	};
 
-//---[ kTip prototype ]-------------------------------------------------------//
+	//---[ kTip prototype ]---------------------------------------------------//
 
 	kTip.prototype = {
 
@@ -872,51 +872,51 @@
 
 			//---[ Fix narrow blocks past body width ]------------------------//
 
-				modalAnimation = modalAnimation || {type: 'resize'};
+			modalAnimation = modalAnimation || {type: 'resize'};
 
-				if (!modalAnimation.preHeight || !modalAnimation.preWidth) {
-					modalAnimation.preHeight = this.$content.height();
-					modalAnimation.preWidth = this.$content.width();
-				}
+			if (!modalAnimation.preHeight || !modalAnimation.preWidth) {
+				modalAnimation.preHeight = this.$content.height();
+				modalAnimation.preWidth = this.$content.width();
+			}
 
-				if (!this.settings.css.height || !this.settings.css.width) {
-					if (force || !this._moveTimeout) {
-						var self = this;
+			if (!this.settings.css.height || !this.settings.css.width) {
+				if (force || !this._moveTimeout) {
+					var self = this;
 
-						// Create a temp container once every 200ms, to avoid browser
-						// slowness when scrolling
-						this._moveTimeout = setTimeout(function(){
-							self._moveTimeout = null;
-						}, 200);
+					// Create a temp container once every 200ms, to avoid browser
+					// slowness when scrolling
+					this._moveTimeout = setTimeout(function(){
+						self._moveTimeout = null;
+					}, 200);
 
-						var $tempContainer = this.$container.clone();
+					var $tempContainer = this.$container.clone();
 
-						$tempContainer
+					$tempContainer
+						.css({
+							left: 0,
+							top: 0,
+							visibility: 'hidden'
+						})
+						.find('.kTip-content')
 							.css({
-								left: 0,
-								top: 0,
-								visibility: 'hidden'
+								height: this.settings.css.height || '',
+								width: this.settings.css.width || ''
 							})
-							.find('.kTip-content')
-								.css({
-									height: this.settings.css.height || '',
-									width: this.settings.css.width || ''
-								})
-								.end()
-							.show()
-							.appendTo('body');
+							.end()
+						.show()
+						.appendTo('body');
 
-						this.$content.css({
-							//height: $tempContainer.find('.kTip-content').height()
-							width: $tempContainer.find('.kTip-content').width()
-						});
+					this.$content.css({
+						//height: $tempContainer.find('.kTip-content').height()
+						width: $tempContainer.find('.kTip-content').width()
+					});
 
-						$tempContainer.remove();
-					}
+					$tempContainer.remove();
 				}
+			}
 
-				modalAnimation.postHeight = this.$content.height();
-				modalAnimation.postWidth = this.$content.width();
+			modalAnimation.postHeight = this.$content.height();
+			modalAnimation.postWidth = this.$content.width();
 
 			//---[ Call depending on display ]--------------------------------//
 
@@ -1018,250 +1018,252 @@
 
 		moveTooltip: function() {
 
-			//---[ Useful vars ]--------------------------------------------------//
+			//---[ Useful vars ]----------------------------------------------//
 
-				var pos = {top: 0, left: 0},
-				    breatheSeparation = this.settings.breatheSeparation
-				                      + this.settings.tooltip.arrowSize,
-				    windowHeight = $(window).height(),
-				    windowWidth = $(window).width(),
-				    containerHeight = this.$container.outerHeight(true),
-				    containerWidth = this.$container.outerWidth(true),
-				    $source = this.settings.tooltip.positionSource,
-				    sourceOffset = $source.offset(),
-				    sourceHeight = $source.outerHeight(),
-				    sourceWidth = $source.outerWidth(),
-				    distance = this.settings.tooltip.distance,
-				    arrowSize = this.settings.tooltip.arrowSize,
-				    arrowDistance = this.settings.tooltip.arrowDistance,
-				    scrollTop = $(document).scrollTop(),
-				    scrollLeft = $(document).scrollLeft(),
-				    position = this.settings.tooltip.position.split(' ')[0],
-				    modifier = this.settings.tooltip.position.split(' ')[1];
+			var pos = {top: 0, left: 0},
+			    breatheSeparation = this.settings.breatheSeparation
+			                      + this.settings.tooltip.arrowSize,
+			    windowHeight = $(window).height(),
+			    windowWidth = $(window).width(),
+			    containerHeight = this.$container.outerHeight(true),
+			    containerWidth = this.$container.outerWidth(true),
+			    $source = this.settings.tooltip.positionSource,
+			    sourceOffset = $source.offset(),
+			    sourceHeight = $source.outerHeight(),
+			    sourceWidth = $source.outerWidth(),
+			    distance = this.settings.tooltip.distance,
+			    arrowSize = this.settings.tooltip.arrowSize,
+			    arrowDistance = this.settings.tooltip.arrowDistance,
+			    scrollTop = $(document).scrollTop(),
+			    scrollLeft = $(document).scrollLeft(),
+			    position = this.settings.tooltip.position.split(' ')[0],
+			    modifier = this.settings.tooltip.position.split(' ')[1];
 
-			//---[ Fit in window 1 ]----------------------------------------------//
+			//---[ Fit in window 1 ]------------------------------------------//
 
-				if (this.settings.tooltip.fit) {
+			if (this.settings.tooltip.fit) {
 
-					if (position == 'bottom' && windowHeight < (sourceOffset.top - scrollTop + sourceHeight + containerHeight + breatheSeparation)) {
-						position = 'top';
-					}
-
-					if (position == 'top' && (sourceOffset.top - scrollTop - breatheSeparation) < containerHeight) {
-						position = 'bottom';
-					}
-
-					if (position == 'right' && windowWidth < (sourceOffset.left - scrollLeft + sourceWidth + containerWidth + breatheSeparation)) {
-						position = 'left';
-					}
-
-					if (position == 'left' && (sourceOffset.left - scrollLeft - breatheSeparation) < containerWidth) {
-						position = 'right';
-					}
+				if (position == 'bottom' && windowHeight < (sourceOffset.top - scrollTop + sourceHeight + containerHeight + breatheSeparation)) {
+					position = 'top';
 				}
 
-			//---[ Position ]-----------------------------------------------------//
-
-				switch (position) {
-					case 'top':
-						pos.top = sourceOffset.top - containerHeight - distance - arrowSize;
-						break;
-					case 'bottom':
-						pos.top = sourceOffset.top + sourceHeight + distance + arrowSize;
-						break;
-					case 'left':
-						pos.left = sourceOffset.left - containerWidth - distance - arrowSize;
-						break;
-					case 'right':
-						pos.left = sourceOffset.left + sourceWidth + distance + arrowSize;
-						break;
+				if (position == 'top' && (sourceOffset.top - scrollTop - breatheSeparation) < containerHeight) {
+					position = 'bottom';
 				}
 
-			//---[ Modifier ]-----------------------------------------------------//
-
-				switch (modifier) {
-					case 'top':
-						pos.top = sourceOffset.top;
-						break;
-					case 'middle':
-						pos.top = sourceOffset.top - (containerHeight/2) + (sourceHeight/2);
-						break;
-					case 'bottom':
-						pos.top = sourceOffset.top - containerHeight + sourceHeight;
-						break;
-					case 'left':
-						pos.left = sourceOffset.left;
-						break;
-					case 'center':
-						pos.left = sourceOffset.left - (containerWidth/2) + (sourceWidth/2);
-						break;
-					case 'right':
-						pos.left = sourceOffset.left - containerWidth + sourceWidth;
-						break;
+				if (position == 'right' && windowWidth < (sourceOffset.left - scrollLeft + sourceWidth + containerWidth + breatheSeparation)) {
+					position = 'left';
 				}
 
-			//---[ Fit in window 2 ]----------------------------------------------//
+				if (position == 'left' && (sourceOffset.left - scrollLeft - breatheSeparation) < containerWidth) {
+					position = 'right';
+				}
+			}
 
-				if (this.settings.tooltip.fit) {
+			//---[ Position ]-------------------------------------------------//
 
-					var move, posFit;
+			switch (position) {
+				case 'top':
+					pos.top = sourceOffset.top - containerHeight - distance - arrowSize;
+					break;
+				case 'bottom':
+					pos.top = sourceOffset.top + sourceHeight + distance + arrowSize;
+					break;
+				case 'left':
+					pos.left = sourceOffset.left - containerWidth - distance - arrowSize;
+					break;
+				case 'right':
+					pos.left = sourceOffset.left + sourceWidth + distance + arrowSize;
+					break;
+			}
 
-					if (position == 'left' || position == 'right') {
-						posFit = {
-							pos: 'top',
-							source: sourceHeight,
-							sourceOffset: sourceOffset.top,
-							container: containerHeight,
-							window: windowHeight,
-							scroll: scrollTop
-						};
+			//---[ Modifier ]-------------------------------------------------//
+
+			switch (modifier) {
+				case 'top':
+					pos.top = sourceOffset.top;
+					break;
+				case 'middle':
+					pos.top = sourceOffset.top - (containerHeight/2) + (sourceHeight/2);
+					break;
+				case 'bottom':
+					pos.top = sourceOffset.top - containerHeight + sourceHeight;
+					break;
+				case 'left':
+					pos.left = sourceOffset.left;
+					break;
+				case 'center':
+					pos.left = sourceOffset.left - (containerWidth/2) + (sourceWidth/2);
+					break;
+				case 'right':
+					pos.left = sourceOffset.left - containerWidth + sourceWidth;
+					break;
+			}
+
+			//---[ Fit in window 2 ]------------------------------------------//
+
+			if (this.settings.tooltip.fit) {
+
+				var move, posFit;
+
+				if (position == 'left' || position == 'right') {
+					posFit = {
+						pos: 'top',
+						source: sourceHeight,
+						sourceOffset: sourceOffset.top,
+						container: containerHeight,
+						window: windowHeight,
+						scroll: scrollTop
+					};
+				} else {
+					posFit = {
+						pos: 'left',
+						source: sourceWidth,
+						sourceOffset: sourceOffset.left,
+						container: containerWidth,
+						window: windowWidth,
+						scroll: scrollLeft
+					};
+				}
+
+				while ((pos[posFit.pos] - posFit.scroll + posFit.container + breatheSeparation) > posFit.window) {
+					move = false;
+					if (posFit.container >= posFit.source) {
+						if ((pos[posFit.pos] + posFit.container) > (posFit.sourceOffset + posFit.source)) {
+							move = true;
+						}
+					} else if (pos[posFit.pos] > posFit.sourceOffset) {
+						move = true;
+					}
+
+					if (move) {
+						pos[posFit.pos]--;
 					} else {
-						posFit = {
-							pos: 'left',
-							source: sourceWidth,
-							sourceOffset: sourceOffset.left,
-							container: containerWidth,
-							window: windowWidth,
-							scroll: scrollLeft
-						};
+						break;
 					}
+				}
 
-					while ((pos[posFit.pos] - posFit.scroll + posFit.container + breatheSeparation) > posFit.window) {
-						move = false;
-						if (posFit.container >= posFit.source) {
-							if ((pos[posFit.pos] + posFit.container) > (posFit.sourceOffset + posFit.source)) {
-								move = true;
-							}
-						} else if (pos[posFit.pos] > posFit.sourceOffset) {
+				while ((pos[posFit.pos] - posFit.scroll) < breatheSeparation) {
+					move = false;
+					if (posFit.container >= posFit.source) {
+						if (pos[posFit.pos] < posFit.sourceOffset) {
 							move = true;
 						}
-
-						if (move) {
-							pos[posFit.pos]--;
-						} else {
-							break;
-						}
+					} else if ((pos[posFit.pos] + posFit.container) < (posFit.sourceOffset + posFit.source)) {
+						move = true;
 					}
 
-					while ((pos[posFit.pos] - posFit.scroll) < breatheSeparation) {
-						move = false;
-						if (posFit.container >= posFit.source) {
-							if (pos[posFit.pos] < posFit.sourceOffset) {
-								move = true;
-							}
-						} else if ((pos[posFit.pos] + posFit.container) < (posFit.sourceOffset + posFit.source)) {
-							move = true;
-						}
-
-						if (move) {
-							pos[posFit.pos]++;
-						} else {
-							break;
-						}
+					if (move) {
+						pos[posFit.pos]++;
+					} else {
+						break;
 					}
+				}
 
-					if (arrowSize && posFit.source < (arrowSize + arrowDistance*2)) {
-						var arrowSeparationTop = posFit.sourceOffset + (posFit.source / 2) - arrowSize - pos[posFit.pos],
-						    arrowSeparationBottom = pos[posFit.pos] + posFit.container - posFit.sourceOffset - (posFit.source / 2) - arrowSize;
+				if (arrowSize && posFit.source < (arrowSize + arrowDistance*2)) {
+					var arrowSeparationTop = posFit.sourceOffset + (posFit.source / 2) - arrowSize - pos[posFit.pos],
+					    arrowSeparationBottom = pos[posFit.pos] + posFit.container - posFit.sourceOffset - (posFit.source / 2) - arrowSize;
 
-						if (!(arrowSeparationTop < arrowDistance && arrowSeparationBottom < arrowDistance)) {
-							if (arrowSeparationTop < arrowDistance) {
-								pos[posFit.pos] = posFit.sourceOffset + (posFit.source / 2) - arrowSize - arrowDistance;
-							}
-							if (arrowSeparationBottom < arrowDistance) {
-								pos[posFit.pos] = posFit.sourceOffset - posFit.container + (posFit.source / 2) + arrowSize + arrowDistance;
-								arrowSeparationTop = posFit.sourceOffset + (posFit.source / 2) - arrowSize - pos[posFit.pos];
-							}
+					if (!(arrowSeparationTop < arrowDistance && arrowSeparationBottom < arrowDistance)) {
+						if (arrowSeparationTop < arrowDistance) {
+							pos[posFit.pos] = posFit.sourceOffset + (posFit.source / 2) - arrowSize - arrowDistance;
+						}
+						if (arrowSeparationBottom < arrowDistance) {
+							pos[posFit.pos] = posFit.sourceOffset - posFit.container + (posFit.source / 2) + arrowSize + arrowDistance;
 							arrowSeparationTop = posFit.sourceOffset + (posFit.source / 2) - arrowSize - pos[posFit.pos];
-						    arrowSeparationBottom = pos[posFit.pos] + posFit.container - posFit.sourceOffset - (posFit.source / 2) - arrowSize;
-							if (arrowSeparationTop < arrowDistance || arrowSeparationBottom < arrowDistance) {
-								pos[posFit.pos] = posFit.sourceOffset - ((posFit.container - (arrowSize * 2)) / 2);
-							}
+						}
+						arrowSeparationTop = posFit.sourceOffset + (posFit.source / 2) - arrowSize - pos[posFit.pos];
+					    arrowSeparationBottom = pos[posFit.pos] + posFit.container - posFit.sourceOffset - (posFit.source / 2) - arrowSize;
+						if (arrowSeparationTop < arrowDistance || arrowSeparationBottom < arrowDistance) {
+							pos[posFit.pos] = posFit.sourceOffset - ((posFit.container - (arrowSize * 2)) / 2);
 						}
 					}
 				}
+			}
 
-			//---[ Arrow ]--------------------------------------------------------//
+			//---[ Arrow ]----------------------------------------------------//
 
-				if (arrowSize) {
-					if (!this.$tooltipArrow) {
-						this.createElements();
-					}
-
-					this.$tooltipArrow.show();
-
-					if (position == 'top' || position == 'bottom') {
-						this.$tooltipArrow.css({
-							bottom: position == 'top' ? -arrowSize : '',
-							height: arrowSize,
-							left: (containerWidth < sourceWidth)
-								? (containerWidth / 2) - arrowSize
-								: (sourceOffset.left - pos.left) + (sourceWidth / 2) - arrowSize,
-							top: position == 'top' ? '' : -arrowSize,
-							width: arrowSize*2
-						}).find('div').css({
-							borderLeftColor: 'transparent',
-							borderRightColor: 'transparent',
-							borderBottomWidth: position == 'top' ? 0 : arrowSize,
-							borderTopWidth: position == 'bottom' ? 0 : arrowSize
-						}).filter('.kTip-arrow-front').css({
-							left: 0,
-							top: (position == 'top' ? '-' : '')+this.$content.css('borderBottomWidth')
-						}).end().filter('.kTip-arrow-shadow')
-							.css('border-'+position+'-color', this.$content.css('border-'+(position == 'top' ? 'bottom' : 'top')+'-color'));
-					} else {
-						this.$tooltipArrow.css({
-							bottom: '',
-							height: arrowSize*2,
-							left: position == 'left' ? '' : -arrowSize,
-							right: position == 'right' ? '' : -arrowSize,
-							top: (containerHeight < sourceHeight)
-								? (containerHeight / 2) - arrowSize
-								: (sourceOffset.top - pos.top) + (sourceHeight / 2) - arrowSize,
-							width: arrowSize
-						}).find('div').css({
-							borderBottomColor: 'transparent',
-							borderTopColor: 'transparent',
-							borderLeftWidth: position == 'right' ? 0 : arrowSize,
-							borderRightWidth: position == 'left' ? 0 : arrowSize
-						}).filter('.kTip-arrow-front').css({
-							left: (position == 'left' ? '-' : '')+this.$content.css('borderBottomWidth'),
-							top: 0
-						}).end().filter('.kTip-arrow-shadow')
-							.css('border-'+position+'-color', this.$content.css('border-'+(position == 'left' ? 'right' : 'left')+'-color'));
-					}
-				} else if (this.$tooltipArrow) {
-					this.$tooltipArrow.hide();
+			if (arrowSize) {
+				if (!this.$tooltipArrow) {
+					this.createElements();
 				}
+
+				this.$tooltipArrow.show();
+
+				if (position == 'top' || position == 'bottom') {
+					this.$tooltipArrow.css({
+						bottom: position == 'top' ? -arrowSize : '',
+						height: arrowSize,
+						left: (containerWidth < sourceWidth)
+							? (containerWidth / 2) - arrowSize
+							: (sourceOffset.left - pos.left) + (sourceWidth / 2) - arrowSize,
+						top: position == 'top' ? '' : -arrowSize,
+						width: arrowSize*2
+					}).find('div').css({
+						borderLeftColor: 'transparent',
+						borderRightColor: 'transparent',
+						borderBottomWidth: position == 'top' ? 0 : arrowSize,
+						borderTopWidth: position == 'bottom' ? 0 : arrowSize
+					}).filter('.kTip-arrow-front').css({
+						left: 0,
+						top: (position == 'top' ? '-' : '')+this.$content.css('borderBottomWidth')
+					}).end().filter('.kTip-arrow-shadow')
+						.css('border-'+position+'-color', this.$content.css('border-'+(position == 'top' ? 'bottom' : 'top')+'-color'));
+				} else {
+					this.$tooltipArrow.css({
+						bottom: '',
+						height: arrowSize*2,
+						left: position == 'left' ? '' : -arrowSize,
+						right: position == 'right' ? '' : -arrowSize,
+						top: (containerHeight < sourceHeight)
+							? (containerHeight / 2) - arrowSize
+							: (sourceOffset.top - pos.top) + (sourceHeight / 2) - arrowSize,
+						width: arrowSize
+					}).find('div').css({
+						borderBottomColor: 'transparent',
+						borderTopColor: 'transparent',
+						borderLeftWidth: position == 'right' ? 0 : arrowSize,
+						borderRightWidth: position == 'left' ? 0 : arrowSize
+					}).filter('.kTip-arrow-front').css({
+						left: (position == 'left' ? '-' : '')+this.$content.css('borderBottomWidth'),
+						top: 0
+					}).end().filter('.kTip-arrow-shadow')
+						.css('border-'+position+'-color', this.$content.css('border-'+(position == 'left' ? 'right' : 'left')+'-color'));
+				}
+			} else if (this.$tooltipArrow) {
+				this.$tooltipArrow.hide();
+			}
 
 			//---[ Experimental fixed position ]------------------------------//
 
-				if (position == 'bottom') {
-					var $aux = $source,
-					    isFixed = false;
+			if (position == 'bottom') {
+				var $aux = $source,
+				    isFixed = false;
 
-					while (!$aux.is('body')) {
-						if ($aux.css('position') == 'fixed') {
-							isFixed = true;
-							break;
-						}
-						$aux = $aux.parent();
+				while (!$aux.is('body')) {
+					if ($aux.css('position') == 'fixed') {
+						isFixed = true;
+						break;
 					}
-
-					if (isFixed) {
-						pos.position = 'fixed';
-						//pos.top = $source.position().top + sourceHeight + 2;
-						pos.top = pos.top - scrollTop;
-					} else {
-						pos.position = 'absolute';
-					}
+					$aux = $aux.parent();
 				}
+
+				if (isFixed) {
+					pos.position = 'fixed';
+					//pos.top = $source.position().top + sourceHeight + 2;
+					pos.top = pos.top - scrollTop;
+				} else {
+					pos.position = 'absolute';
+				}
+			}
+
+			//---[ Apply changes ]--------------------------------------------//
 
 			this.$container.css(pos);
 		}
 	};
 
-//---[ Browser scrollbar width ]----------------------------------------------//
+	//---[ Browser scrollbar width ]------------------------------------------//
 
 	$(function(){
 		var $testDiv = $('<div/>')
@@ -1270,7 +1272,7 @@
 			.appendTo('body');
 
 		window.kTip.prototype._browserScrollbarWidth = $testDiv.find('> div').width()
-		                                                   - $testDiv.css('overflow-y', 'scroll').find('> div').width();
+		                                             - $testDiv.css('overflow-y', 'scroll').find('> div').width();
 		$testDiv.remove();
 	});
 
