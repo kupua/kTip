@@ -6,7 +6,6 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
  * TODO:
- *   - Infinite linked tooltips
  *   - Test callbacks
  *   - Fit to mobile
  *   - Hide if trigger is hidden
@@ -186,7 +185,7 @@
 			switch (this.settings.display) {
 
 				case 'modal':
-					this.$trigger.bind('click', function(e){
+					this.$trigger.on('click', function(e){
 						self.open(self.settings.showDelay);
 						e.preventDefault();
 						//e.stopPropagation();
@@ -196,14 +195,14 @@
 				case 'tooltip':
 					switch (this.settings.tooltip.bind) {
 						case 'click':
-							this.$trigger.bind('click', function(e){
+							this.$trigger.on('click', function(e){
 								self.isVisible() ? self.close() : self.open(self.settings.showDelay);
 								e.preventDefault();
 								//e.stopPropagation();
 							});
 							break;
 						case 'hover':
-							this.$trigger.bind({
+							this.$trigger.on({
 								mouseenter: function(){self.open(self.settings.showDelay)},
 								mouseleave: function(){self.close(self.settings.hideDelay)},
 								mousedown: function(e){e.stopPropagation()},
@@ -211,7 +210,7 @@
 							});
 							break;
 						case 'focus':
-							this.$trigger.bind({
+							this.$trigger.on({
 								focus: function(){self.open(self.settings.showDelay)},
 								blur: function(){self.close(self.settings.hideDelay)},
 								mousedown: function(e){e.stopPropagation()},
@@ -238,13 +237,13 @@
 		_browserScrollbarWidth: 17, // Default value, will be updated when DOM is ready
 
 		isVisible: function() {
-			return !!this.$container && this.$container.is(':visible');
+			return this.$container && this.$container.is(':visible');
 		},
 
 		areAllChildrenClosed: function() {
 
 			// Find children that have kTip instances. If they are open, let
-			// them decide about their own children (don't do recursive search)
+			// them decide about their own children (don't do recursive search).
 
 			var allChildrenClosed = true;
 
@@ -357,17 +356,17 @@
 			});
 		},
 
-		setContent: function(html, modalContentChangeAnimation) {
+		setContent: function(html, modalAnimation) {
 
 			if (!this.$container) {
 				this.createElements();
 			}
 
 			if (this.settings.display == 'modal') {
-				modalContentChangeAnimation = modalContentChangeAnimation || {type: 'resize'};
-				modalContentChangeAnimation.$preContent = this.$content.clone(false);
-				modalContentChangeAnimation.preHeight = this.$content.height();
-				modalContentChangeAnimation.preWidth = this.$content.width();
+				modalAnimation = modalAnimation || {type: 'resize'};
+				modalAnimation.$preContent = this.$content.clone(false);
+				modalAnimation.preHeight = this.$content.height();
+				modalAnimation.preWidth = this.$content.width();
 			}
 
 			var $dummyContent = this.$content.clone();
@@ -415,7 +414,7 @@
 
 			if (this.isVisible() && this.$container.css('opacity') == 1) {
 				this.setFocus();
-				return this.moveContainer(modalContentChangeAnimation, true);
+				return this.moveContainer(modalAnimation, true);
 			} else {
 				this.showContainer();
 			}
@@ -493,7 +492,7 @@
 
 			// File uploads don't work on IE. MUST FIX
 			if (this.settings.ajax.handleForms && $.fn.ajaxSubmit) {
-				this.$content.find('form').bind('submit', function(e){
+				this.$content.find('form').on('submit', function(e){
 					var $form = $(this);
 					e.preventDefault();
 					// if ($form.attr('enctype') == 'multipart/form-data' || $form.find('input[type="file"]').length) {
@@ -517,11 +516,11 @@
 							self.settings.onFailedRequest.call(self, jqXHR, textStatus, errorThrown);
 						}
 					}));
-					self.setLoadingState(); // After submit as we are disabling all input fields
+					self.setLoadingState(); // After submit, as we are disabling all input fields
 				});
 			}
 
-			// this.$content.find('form').bind('submit kTip_submit', function(e){
+			// this.$content.find('form').on('submit kTip_submit', function(e){
 			// 	e.preventDefault();
 			// 	var $elem = $(this);
 			// 	if (e.type == 'kTip_submit') {
@@ -536,30 +535,31 @@
 			// 	}
 			// });
 
-			this.$content.find('[class*="kTip-redirect"]').bind('click', function(e){
+			this.$content.find('[class*="kTip-redirect"]').on('click', function(e){
 				var $elem = $(this);
 
 				e.preventDefault();
 
 				// $elem.addClass(self.settings.loadingClass); // Why repeat? Already used in loadAjaxContent
 
-				var modalContentChangeAnimation = {};
+				var modalAnimation = {};
 
 				if (self.settings.display == 'modal') {
 					if ($elem.is('[class*="redirect-fade"]')) {
-						modalContentChangeAnimation.type = 'fade';
+						modalAnimation.type = 'fade';
 					} else if ($elem.is('[class*="redirect-move"]')) {
-						modalContentChangeAnimation.type = 'move';
+						modalAnimation.type = 'move';
 					} else if ($elem.is('[class*="redirect-instant"]')) {
-						modalContentChangeAnimation.type = 'instant';
+						modalAnimation.type = 'instant';
 					} else {
-						modalContentChangeAnimation.type = 'resize';
+						modalAnimation.type = 'resize';
 					}
 				}
 
-				self.redirect($elem.attr('href'), modalContentChangeAnimation);
+				self.redirect($elem.attr('href'), modalAnimation);
 			});
-			this.$content.find('.kTip-close').bind('click', function(e){
+
+			this.$content.find('.kTip-close').on('click', function(e){
 				self.close();
 				e.preventDefault();
 			});
@@ -572,12 +572,12 @@
 		// 	}
 		// },
 
-		redirect: function(url, modalContentChangeAnimation) {
+		redirect: function(url, modalAnimation) {
 			this.settings.ajax.url = url;
-			this.loadAjaxContent(url, modalContentChangeAnimation);
+			this.loadAjaxContent(url, modalAnimation);
 		},
 
-		loadAjaxContent: function(url, modalContentChangeAnimation) {
+		loadAjaxContent: function(url, modalAnimation) {
 
 			// this.abortCurrentAjaxRequest();
 
@@ -610,7 +610,7 @@
 			// 	// Create the iframe
 			// 	$('<iframe name="'+iframeName+'" id="'+iframeName+'" src="" style="display:none;"></iframe>')
 			// 		.appendTo('body')
-			// 		.bind('load', function(){
+			// 		.on('load', function(){
 			// 			self.$trigger.removeClass(self.settings.loadingClass);
 			// 			self.settings.onStopLoading.call(self);
 
@@ -624,7 +624,7 @@
 			// 				}
 			// 			} catch (err) {}
 			// 			// ... or just plain HTML?
-			// 			self.setContent(response, modalContentChangeAnimation);
+			// 			self.setContent(response, modalAnimation);
 			// 		});
 
 			// 	// Leave a visible copy of the form for usability reasons (we'll move the original)
@@ -640,7 +640,7 @@
 			// 		  .attr('action', this.settings.ajaxUrl || this.$trigger.attr('href'))
 			// 		  .attr('target', iframeName)
 			// 		  .append('<input type="hidden" name="is_iframe" value="true" />')
-			// 		  .unbind('submit')
+			// 		  .off('submit')
 			// 		  .trigger('submit');
 			// } else {
 				$.ajax($.extend(true, {}, self.settings.ajax, {
@@ -654,7 +654,7 @@
 						if (typeof data == 'object') {
 							self.settings.onJsonData.call(self, data);
 						} else {
-							self.setContent(data, modalContentChangeAnimation);
+							self.setContent(data, modalAnimation);
 						}
 					},
 					error: function(jqXHR, textStatus, errorThrown){
@@ -664,7 +664,7 @@
 						// if (textStatus !== 'abort') {
 						// 	self.$trigger.removeClass(self.settings.loadingClass);
 						// 	self.settings.onStopLoading.call(self);
-						// 	self.setContent('<div class="notice alert">S\'ha produït un error</div>', modalContentChangeAnimation);
+						// 	self.setContent('<div class="notice alert">S\'ha produït un error</div>', modalAnimation);
 						// }
 					}
 				}));
@@ -751,7 +751,7 @@
 							})
 							.appendTo('body')
 						: 'body')
-					.bind('mouseup', function(e){
+					.on('mouseup', function(e){
 						// Required if outsideClose is set to true
 						self._preventNextMouseup = true;
 					});
@@ -762,15 +762,15 @@
 					.appendTo(this.$container);
 
 				if (this.settings.tooltip.bind == 'hover') {
-					this.$container.bind('mouseenter', function(){self.open(self.settings.showDelay)});
-					this.$container.bind('mouseleave', function(){self.close(self.settings.hideDelay)});
+					this.$container.on('mouseenter', function(){self.open(self.settings.showDelay)});
+					this.$container.on('mouseleave', function(){self.close(self.settings.hideDelay)});
 				}
 
 				// Resize re-position
-				$(window).bind('resize', function(){self.moveContainer()});
+				$(window).on('resize', function(){self.moveContainer()});
 
 				if (this.settings.display == 'tooltip') {
-					$(window).bind('scroll', function(){self.moveContainer()});
+					$(window).on('scroll', function(){self.moveContainer()});
 				}
 
 				// Hide on outside click
@@ -795,7 +795,7 @@
 					// ...and here closing when it started outside. Tada!
 					// Also: using body instead of document as clicking on the
 					// sidebar would trigger the event.
-					$('body').bind('mouseup', function(e){
+					$('body').on('mouseup', function(e){
 						if (self._lastMousedownOutside) {
 							if (self._preventNextMousedown) {
 								self._preventNextMousedown = false;
@@ -808,7 +808,7 @@
 
 				// Hide on ESC press
 				if (this.settings.escClose) {
-					$(document).bind('keyup', function(e){
+					$(document).on('keyup', function(e){
 						if (e.keyCode == 27 && self.isVisible() && self.areAllChildrenClosed()) {
 							self.close();
 						}
@@ -862,7 +862,7 @@
 			}
 		},
 
-		moveContainer: function(modalContentChangeAnimation, force) {
+		moveContainer: function(modalAnimation, force) {
 
 			if (!this.isVisible()) {
 				return;
@@ -872,11 +872,11 @@
 
 			//---[ Fix narrow blocks past body width ]------------------------//
 
-				modalContentChangeAnimation = modalContentChangeAnimation || {type: 'resize'};
+				modalAnimation = modalAnimation || {type: 'resize'};
 
-				if (!modalContentChangeAnimation.preHeight || !modalContentChangeAnimation.preWidth) {
-					modalContentChangeAnimation.preHeight = this.$content.height();
-					modalContentChangeAnimation.preWidth = this.$content.width();
+				if (!modalAnimation.preHeight || !modalAnimation.preWidth) {
+					modalAnimation.preHeight = this.$content.height();
+					modalAnimation.preWidth = this.$content.width();
 				}
 
 				if (!this.settings.css.height || !this.settings.css.width) {
@@ -915,14 +915,14 @@
 					}
 				}
 
-				modalContentChangeAnimation.postHeight = this.$content.height();
-				modalContentChangeAnimation.postWidth = this.$content.width();
+				modalAnimation.postHeight = this.$content.height();
+				modalAnimation.postWidth = this.$content.width();
 
 			//---[ Call depending on display ]--------------------------------//
 
 			switch (this.settings.display) {
 				case 'modal':
-					this.moveModal(modalContentChangeAnimation);
+					this.moveModal(modalAnimation);
 					break;
 				case 'tooltip':
 					this.moveTooltip();
@@ -930,7 +930,7 @@
 			}
 		},
 
-		moveModal: function(modalContentChangeAnimation) {
+		moveModal: function(modalAnimation) {
 
 			var self = this,
 			    top = 0,
@@ -962,14 +962,14 @@
 				left = 0;
 			}
 
-			switch (modalContentChangeAnimation.type) {
+			switch (modalAnimation.type) {
 
 				case 'fade':
 					this.$content.hide();
 					this.$container
-						.append(modalContentChangeAnimation.$preContent)
+						.append(modalAnimation.$preContent)
 						.fadeOut(this.settings.modal.animateSpeed, function(){
-							modalContentChangeAnimation.$preContent.remove();
+							modalAnimation.$preContent.remove();
 							self.$content.show();
 							self.$container.css({
 								top: top,
@@ -999,11 +999,11 @@
 				case 'resize':
 				default:
 					this.$content.css({
-						height: modalContentChangeAnimation.preHeight,
-						width: modalContentChangeAnimation.preWidth
+						height: modalAnimation.preHeight,
+						width: modalAnimation.preWidth
 					}).animate({
-						height: modalContentChangeAnimation.postHeight,
-						width: modalContentChangeAnimation.postWidth
+						height: modalAnimation.postHeight,
+						width: modalAnimation.postWidth
 					}, this.settings.modal.animateSpeed, function(){
 						self.$content.css('height', self.settings.css.height || '');
 					});

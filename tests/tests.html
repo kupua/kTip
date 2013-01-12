@@ -82,6 +82,8 @@
 		<p><span class="button ajax-error">Ajax error</span> <span class="button modal ajax-error">Ajax error</span></p>
 		<p><span class="button default-form">Default form</span> <span class="button modal default-form">Default form</span></p>
 		<p><span class="button ajax-form">Ajax form</span> <span class="button modal ajax-form">Ajax form</span></p>
+		<p><span class="button file-upload">File upload</span> <span class="button modal file-upload">File upload</span></p>
+		<p><span class="button infinite">Infinite</span></p>
 	</div>
 
 <script>
@@ -226,6 +228,24 @@
 				data: {
 					ajax: 'true'
 				}
+			}
+		}
+	]);
+
+	// File upload
+	test('.file-upload', [
+		{
+			ajax: {
+				url: 'file-upload.php'
+			}
+		}
+	]);
+
+	// Infinite
+	test('.infinite', [
+		{
+			ajax: {
+				url: 'infinite.php'
 			}
 		}
 	]);

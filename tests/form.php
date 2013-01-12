@@ -30,9 +30,10 @@
 	}
 
 ?>
-<form method="post">
+<form method="post" enctype="multipart/form-data">
 	<input type="hidden" name="identifier" value="form-2" />
 	<input type="text" name="text" />
+	<input type="file" name="file" />
 	<input type="submit" value="Form 2" />
 </form>
 
