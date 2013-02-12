@@ -582,96 +582,35 @@
 			// this.abortCurrentAjaxRequest();
 
 			var self = this;
-				// ajaxData = $.extend({}, self.settings.ajaxData);
 
 			this.setLoadingState();
 			this.settings.onStartLoading.call(this);
 
-			// if (submit) {
-			// 	this._lastSubmitName = submit.find(this.settings.submitIdentifier).val();
-			// 	submit.find(':input').each(function(){
-			// 		if ($(this).is(':checkbox')) {
-			// 			ajaxData[$(this).attr('name')] = $(this).prop('checked') ? 1 : 0;
-			// 		} else if ($(this).is(':radio')) {
-			// 			if ($(this).prop('checked'))
-			// 				ajaxData[$(this).attr('name')] = $(this).val();
-			// 		} else {
-			// 			ajaxData[$(this).attr('name')] = $(this).val();
-			// 		}
-			// 	});
-			// }
+			$.ajax($.extend(true, {}, self.settings.ajax, {
+				type: 'GET',
+				url: url,
+				success: function(data){
+					// self._currentAjaxRequest = null;
+					self.disableLoadingState();
+					self.settings.onStopLoading.call(self);
 
-			// We'll use an iframe as an ajax workaround if we're dealing with file uploads
-			// if (submit && submit.attr('enctype') == 'multipart/form-data') {
-
-			// 	// Create a random ID for the new iframe
-			// 	var iframeName = 'kTip-iframe'+Math.floor(Math.random()*99999);
-
-			// 	// Create the iframe
-			// 	$('<iframe name="'+iframeName+'" id="'+iframeName+'" src="" style="display:none;"></iframe>')
-			// 		.appendTo('body')
-			// 		.on('load', function(){
-			// 			self.$trigger.removeClass(self.settings.loadingClass);
-			// 			self.settings.onStopLoading.call(self);
-
-			// 			var response = $(this).contents().find('body').html();
-			// 			// Is it a JSON object?
-			// 			try {
-			// 				var data = eval('('+response+')');
-			// 				if (typeof data == 'object') {
-			// 					self.settings.onJsonData.call(self, data);
-			// 					return;
-			// 				}
-			// 			} catch (err) {}
-			// 			// ... or just plain HTML?
-			// 			self.setContent(response, modalAnimation);
-			// 		});
-
-			// 	// Leave a visible copy of the form for usability reasons (we'll move the original)
-			// 	submit.clone().insertAfter(submit);
-
-			// 	// Add ajaxData vars as hidden inputs
-			// 	$.each(this.settings.ajaxData, function(name, value){
-			// 		submit.append('<input type="hidden" name="'+name+'" value="'+value+'" />');
-			// 	});
-
-			// 	// Move form inside the iframe (Chrome had issues otherwise)
-			// 	submit.appendTo($('#'+iframeName))
-			// 		  .attr('action', this.settings.ajaxUrl || this.$trigger.attr('href'))
-			// 		  .attr('target', iframeName)
-			// 		  .append('<input type="hidden" name="is_iframe" value="true" />')
-			// 		  .off('submit')
-			// 		  .trigger('submit');
-			// } else {
-				$.ajax($.extend(true, {}, self.settings.ajax, {
-					type: 'GET',
-					url: url,
-					success: function(data){
-						// self._currentAjaxRequest = null;
-						self.disableLoadingState();
-						self.settings.onStopLoading.call(self);
-
-						if (typeof data == 'object') {
-							self.settings.onJsonData.call(self, data);
-						} else {
-							self.setContent(data, modalAnimation);
-						}
-					},
-					error: function(jqXHR, textStatus, errorThrown){
-						self.settings.onFailedRequest.call(self, jqXHR, textStatus, errorThrown);
-						// self._currentAjaxRequest = null;
-
-						// if (textStatus !== 'abort') {
-						// 	self.$trigger.removeClass(self.settings.loadingClass);
-						// 	self.settings.onStopLoading.call(self);
-						// 	self.setContent('<div class="notice alert">S\'ha produït un error</div>', modalAnimation);
-						// }
+					if (typeof data == 'object') {
+						self.settings.onJsonData.call(self, data);
+					} else {
+						self.setContent(data, modalAnimation);
 					}
-				}));
-			// }
+				},
+				error: function(jqXHR, textStatus, errorThrown){
+					self.settings.onFailedRequest.call(self, jqXHR, textStatus, errorThrown);
+					// self._currentAjaxRequest = null;
 
-			// if (this.$content)
-			// 	this.setLoadingState();
+					// if (textStatus !== 'abort') {
+					// 	self.$trigger.removeClass(self.settings.loadingClass);
+					// 	self.settings.onStopLoading.call(self);
+					// 	self.setContent('<div class="notice alert">S\'ha produït un error</div>', modalAnimation);
+					// }
+				}
+			}));
 		},
 
 		setLoadingState: function() {
