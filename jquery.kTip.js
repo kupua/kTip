@@ -22,8 +22,21 @@
 
 (function($, window, undefined){
 
-	// Default value, will be updated when DOM is ready
-	var _browserScrollbarWidth = 17;
+	// Real value is calculated on document ready
+	var _browserScrollbarWidth;
+
+	// Based on https://hacks.mozilla.org/2011/09/detecting-and-generating-css-animations-in-javascript/
+	var _browserSupportsCSSAnimations = function(){
+		var elem = document.createElement('div'),
+		    domPrefixes = ' Webkit Moz O ms Khtml'.split(' ');
+
+		for (var i = 0; i < domPrefixes.length; i++) {
+			if (domPrefixes[i] + 'AnimationName' in elem.style) {
+				return true;
+			}
+		}
+		return false;
+	}();
 
 	//---[ jQuery plugin ]----------------------------------------------------//
 
