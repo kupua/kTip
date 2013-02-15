@@ -22,6 +22,9 @@
 
 (function($, window, undefined){
 
+	// Default value, will be updated when DOM is ready
+	var _browserScrollbarWidth = 17;
+
 	//---[ jQuery plugin ]----------------------------------------------------//
 
 	$.fn.kTip = function(defaultContent, options) {
@@ -152,7 +155,7 @@
 			onFailedRequest: function(jqXHR, textStatus, errorThrown) {
 				alert("Please implement onFailedRequest to manage failed ajax requests.");
 			},
-			onJsonData: function(data){
+			onJsonData: function(data) {
 				alert("Please implement onJsonData to manage ajax JSON responses.");
 			}
 		};
@@ -233,8 +236,6 @@
 	kTip.prototype = {
 
 		defaults: {},
-
-		_browserScrollbarWidth: 17, // Default value, will be updated when DOM is ready
 
 		isVisible: function() {
 			return this.$container && this.$container.is(':visible');
@@ -462,7 +463,7 @@
 			if (this.settings.overlay) {
 				if (this.settings.display == 'modal') {
 					$('body').css({
-						marginRight: this._browserScrollbarWidth,
+						marginRight: _browserScrollbarWidth,
 						overflow: 'hidden'
 					});
 					this.settings.modal.onDisableScroll.call(this);
@@ -885,7 +886,7 @@
 			    scrollTop = this.settings.overlay ? 0 : $(document).scrollTop();
 
 			if (this.settings.overlay) {
-				containerWidth += this._browserScrollbarWidth;
+				containerWidth += _browserScrollbarWidth;
 			}
 
 			if (containerHeight < wrapperHeight) {
@@ -1206,12 +1207,16 @@
 
 	$(function(){
 		var $testDiv = $('<div/>')
-			.css({height: 100, overflow: 'hidden', position: 'absolute', width: 100})
-			.append($('<div/>').css('height', '100%'))
+			.css({
+				height: 100,
+				overflowY: 'scroll',
+				width: 100
+			})
+			.append($('<div/>').css('height', 200))
 			.appendTo('body');
 
-		window.kTip.prototype._browserScrollbarWidth = $testDiv.find('> div').width()
-		                                             - $testDiv.css('overflow-y', 'scroll').find('> div').width();
+		_browserScrollbarWidth = $testDiv.children().innerWidth();
+
 		$testDiv.remove();
 	});
 
