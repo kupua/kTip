@@ -22,6 +22,8 @@
 
 (function($, window, undefined){
 
+	//---[ Browser utils ]----------------------------------------------------//
+
 	var browserVendorPrefixes = ' Webkit Moz O ms Khtml'.split(' ');
 
 	// Real value is calculated on document ready
@@ -435,21 +437,6 @@
 					// position: 'absolute',
 					visibility: 'hidden'
 				})
-				// We remove the margin for the first DIV element due to aesthetical
-				// reasons. If you wish to maintain those proportions, you should set
-				// the equivalent padding in settings.css
-				// .children()
-				// 	.css({
-				// 		marginLeft: 0,
-				// 		marginRight: 0
-				// 	})
-				// 	.first()
-				// 		.css('margin-top', '0')
-				// 		.end()
-				// 	.last()
-				// 		.css('margin-bottom', '0')
-				// 		.end()
-				// 	.end()
 				.appendTo('body');
 
 			this.bindSpecialActions();
@@ -466,11 +453,15 @@
 
 			$dummyContent.remove();
 
-			if (this.isVisible() && this.$container.css('opacity') == 1) {
-				this.setFocus();
-				return this.moveContainer(modalAnimation, true);
-			} else {
-				this.showContainer();
+			// If onContentReady or any other code has decided to close the
+			// container, don't continue moving/showing it
+			if (this._show) {
+				if (this.isVisible() && this.$container.css('opacity') == 1) {
+					this.setFocus();
+					return this.moveContainer(modalAnimation, true);
+				} else {
+					this.showContainer();
+				}
 			}
 		},
 
@@ -526,10 +517,7 @@
 						animationName: this.settings.showAnimation
 					});
 			} else {
-				this.$container.fadeIn(300, function(){
-					self.setFocus();
-					self.settings.onShow.call(self);
-				});
+				this.$container.fadeIn(300, onContainerFadeIn);
 			}
 		},
 
