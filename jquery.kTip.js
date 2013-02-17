@@ -22,16 +22,19 @@
 
 (function($, window, undefined){
 
+	var browserVendorPrefixes = ' Webkit Moz O ms Khtml'.split(' ');
+
 	// Real value is calculated on document ready
-	var _browserScrollbarWidth;
+	var browserScrollbarWidth;
 
 	// Based on https://hacks.mozilla.org/2011/09/detecting-and-generating-css-animations-in-javascript/
-	var _browserSupportsCSSAnimations = function(){
-		var elem = document.createElement('div'),
-		    domPrefixes = ' Webkit Moz O ms Khtml'.split(' ');
+	var browserCSSAnimationVendor;
+	var browserSupportsCSSAnimations = function(){
+		var elem = document.createElement('div');
 
-		for (var i = 0; i < domPrefixes.length; i++) {
-			if (domPrefixes[i] + 'AnimationName' in elem.style) {
+		for (var i = 0; i < browserVendorPrefixes.length; i++) {
+			if (browserVendorPrefixes[i] + 'AnimationName' in elem.style) {
+				browserCSSAnimationVendor = browserVendorPrefixes[i].toLowerCase();
 				return true;
 			}
 		}
@@ -106,13 +109,16 @@
 
 			// Appearance
 			css: {}, // Custom CSS
+			cssAnimations: true, // Use CSS animations when possible
 			extraClass: (options && options.display) ? 'kT-'+options.display : 'kT-tooltip',
 			activeClass: 'active',
 			loadingClass: 'loading',
 			disabledClass: 'disabled',
 			showDelay: (options && options.tooltip && options.tooltip.bind == 'hover') ? 200 : 0, // Show delay in ms
 			hideDelay: (options && options.tooltip && options.tooltip.bind == 'hover') ? 200 : 0, // Hide delay in ms
+			showAnimation: 'kTip-fadeIn',
 			showSpeed: 300,
+			hideAnimation: 'kTip-fadeOut',
 			hideSpeed: 300,
 			overlay: (options && options.display == 'modal') ? true : false,
 			overlayColor: '#fff',
@@ -328,11 +334,16 @@
 			var self = this;
 
 			// this.abortCurrentAjaxRequest();
-			this.$trigger.removeClass(this.settings.loadingClass).removeClass(this.settings.activeClass);
+			this.$trigger
+				.removeClass(this.settings.loadingClass)
+				.removeClass(this.settings.activeClass);
+
 			this.settings.onStopLoading.call(this);
 
 			// Fade container out
-			this.$container.fadeOut(this.settings.hideSpeed, function(){
+			var onContainerFadeOut = function() {
+				// Hide after a CSS animation
+				self.$container.hide();
 
 				// If set to be destroyed, remove the content and bindings,
 				// and call onDestroy
@@ -353,7 +364,20 @@
 				} else {
 					self.settings.onClose.call(self);
 				}
-			});
+			};
+
+			if (this.settings.cssAnimations && browserSupportsCSSAnimations) {
+				this.$container
+					.off(browserCSSAnimationVendor + 'AnimationEnd')
+					.on(browserCSSAnimationVendor + 'AnimationEnd', onContainerFadeOut)
+					.css({
+						animationDuration: this.settings.hideSpeed + 'ms',
+						animationFillMode: 'both',
+						animationName: this.settings.hideAnimation
+					});
+			} else {
+				this.$container.fadeOut(300, onContainerFadeOut);
+			}
 
 			if (this.settings.display == 'tooltip' && this.settings.overlay) {
 				this.$overlay.fadeOut(this.settings.overlayHideSpeed, function(){
@@ -455,38 +479,49 @@
 				});
 			}
 
-			// Fade container in, and call onShow. If it's a modal, fade
-			// overlay in before
-			var fadeInContainer = function(){
-				if (self.settings.display == 'modal' && self.settings.overlay) {
-					self.$container.parent().show();
-				}
-
-				// Set correct position before showing
-				self.$container.css('visibility', 'hidden').show();
-				self.moveContainer({type: 'instant'});
-				self.$container.hide().css('visibility', '');
-
-				self.$container.fadeIn(self.settings.showSpeed, function(){
-					self.setFocus();
-					self.settings.onShow.call(self);
-				});
-			};
-
 			if (this.settings.overlay) {
 				if (this.settings.display == 'modal') {
 					$('body').css({
-						marginRight: _browserScrollbarWidth,
+						marginRight: browserScrollbarWidth,
 						overflow: 'hidden'
 					});
 					this.settings.modal.onDisableScroll.call(this);
-					this.$overlay.fadeIn(this.settings.overlayShowSpeed, fadeInContainer);
+					this.$overlay.fadeIn(this.settings.overlayShowSpeed);
 				} else {
 					this.$overlay.fadeIn(this.settings.overlayShowSpeed);
-					fadeInContainer();
 				}
+			}
+
+			// Fade container in
+			var onContainerFadeIn = function() {
+				self.setFocus();
+				self.settings.onShow.call(self);
+			};
+
+			if (self.settings.display == 'modal' && self.settings.overlay) {
+				self.$container.parent().show();
+			}
+
+			// Set correct position before showing
+			self.$container.css('visibility', 'hidden').show();
+			self.moveContainer({type: 'instant'});
+			self.$container.hide().css('visibility', '');
+
+			if (this.settings.cssAnimations && browserSupportsCSSAnimations) {
+				this.$container
+					.off(browserCSSAnimationVendor + 'AnimationEnd')
+					.on(browserCSSAnimationVendor + 'AnimationEnd', onContainerFadeIn)
+					.show()
+					.css({
+						animationDuration: this.settings.showSpeed + 'ms',
+						animationFillMode: 'both',
+						animationName: this.settings.showAnimation
+					});
 			} else {
-				fadeInContainer();
+				this.$container.fadeIn(300, function(){
+					self.setFocus();
+					self.settings.onShow.call(self);
+				});
 			}
 		},
 
@@ -899,7 +934,7 @@
 			    scrollTop = this.settings.overlay ? 0 : $(document).scrollTop();
 
 			if (this.settings.overlay) {
-				containerWidth += _browserScrollbarWidth;
+				containerWidth += browserScrollbarWidth;
 			}
 
 			if (containerHeight < wrapperHeight) {
@@ -1228,7 +1263,7 @@
 			.append($('<div/>').css('height', 200))
 			.appendTo('body');
 
-		_browserScrollbarWidth = $testDiv.children().innerWidth();
+		browserScrollbarWidth = $testDiv.innerWidth() - $testDiv.children().innerWidth();
 
 		$testDiv.remove();
 	});

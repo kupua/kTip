@@ -8,6 +8,8 @@
 html { overflow-y: visible !important; }
 body { overflow-y: scroll; }
 
+/*---[ Styles ]---------------------------------------------------------------*/
+
 /* Style: default modal */
 .kT-modal .kTip-content {
 	background-color: #fff;
@@ -51,4 +53,46 @@ body { overflow-y: scroll; }
 	color: #fff;
 	font-size: 11px;
 	padding: 8px 10px;
+}
+
+/*---[ Animations ]---------------------------------------------------------- */
+
+@-webkit-keyframes kTip-fadeIn {
+	  0% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@-moz-keyframes kTip-fadeIn {
+	  0% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@-o-keyframes kTip-fadeIn {
+	  0% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@keyframes kTip-fadeIn {
+	  0% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@-webkit-keyframes kTip-fadeOut {
+	  0% { opacity: 1; }
+	100% { opacity: 0; }
+}
+
+@-moz-keyframes kTip-fadeOut {
+	  0% { opacity: 1; }
+	100% { opacity: 0; }
+}
+
+@-o-keyframes kTip-fadeOut {
+	  0% { opacity: 1; }
+	100% { opacity: 0; }
+}
+
+@keyframes kTip-fadeOut {
+	  0% { opacity: 1; }
+	100% { opacity: 0; }
 }
