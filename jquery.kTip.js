@@ -28,18 +28,19 @@
 	var browserScrollbarWidth;
 
 	// Based on https://hacks.mozilla.org/2011/09/detecting-and-generating-css-animations-in-javascript/
-	var browserCSSAnimationVendor;
 	var browserSupportsCSSAnimations = function(){
 		var elem = document.createElement('div');
 
 		for (var i = 0; i < browserVendorPrefixes.length; i++) {
 			if (browserVendorPrefixes[i] + 'AnimationName' in elem.style) {
-				browserCSSAnimationVendor = browserVendorPrefixes[i].toLowerCase();
 				return true;
 			}
 		}
 		return false;
 	}();
+
+	// Each browser listens to its own event
+	var animationEnd = 'animationend webkitAnimationEnd oanimationend MSAnimationEnd';
 
 	//---[ jQuery plugin ]----------------------------------------------------//
 
@@ -116,9 +117,9 @@
 			disabledClass: 'disabled',
 			showDelay: (options && options.tooltip && options.tooltip.bind == 'hover') ? 200 : 0, // Show delay in ms
 			hideDelay: (options && options.tooltip && options.tooltip.bind == 'hover') ? 200 : 0, // Hide delay in ms
-			showAnimation: 'kTip-fadeIn',
+			showAnimation: 'kTip-fadeInDown',
 			showSpeed: 300,
-			hideAnimation: 'kTip-fadeOut',
+			hideAnimation: 'kTip-fadeOutDown',
 			hideSpeed: 300,
 			overlay: (options && options.display == 'modal') ? true : false,
 			overlayColor: '#fff',
@@ -257,7 +258,7 @@
 		defaults: {},
 
 		isVisible: function() {
-			return this.$container && this.$container.is(':visible');
+			return !!this.$container && this.$container.is(':visible');
 		},
 
 		areAllChildrenClosed: function() {
@@ -345,31 +346,26 @@
 				// Hide after a CSS animation
 				self.$container.hide();
 
-				// If set to be destroyed, remove the content and bindings,
-				// and call onDestroy
-				if (self.settings.destroyOnClose) {
-					self.destroy();
-				}
-
-				if (self.settings.display == 'modal' && self.settings.overlay) {
+				if (self.settings.display == 'modal') {
 					self.$container.parent().hide();
 					$('body').css({
 						marginRight: '',
 						overflow: ''
 					});
 					self.settings.modal.onRestoreScroll.call(self);
-					self.$overlay.fadeOut(self.settings.overlayHideSpeed, function(){
-						self.settings.onClose.call(self);
-					});
-				} else {
-					self.settings.onClose.call(self);
+				}
+
+				// If set to be destroyed, remove the content and bindings,
+				// and call onDestroy
+				if (self.settings.destroyOnClose) {
+					self.destroy();
 				}
 			};
 
 			if (this.settings.cssAnimations && browserSupportsCSSAnimations) {
 				this.$container
-					.off(browserCSSAnimationVendor + 'AnimationEnd')
-					.on(browserCSSAnimationVendor + 'AnimationEnd', onContainerFadeOut)
+					.off(animationEnd)
+					.on(animationEnd, onContainerFadeOut)
 					.css({
 						animationDuration: this.settings.hideSpeed + 'ms',
 						animationFillMode: 'both',
@@ -379,13 +375,20 @@
 				this.$container.fadeOut(300, onContainerFadeOut);
 			}
 
-			if (this.settings.display == 'tooltip' && this.settings.overlay) {
-				this.$overlay.fadeOut(this.settings.overlayHideSpeed, function(){
-					self.$trigger.css({
-						position: self._triggerZIndexBackup.position,
-						zIndex: self._triggerZIndexBackup.zIndex
+			if (this.settings.overlay) {
+				if (this.settings.display == 'modal') {
+					this.$overlay.fadeOut(this.settings.overlayHideSpeed, function(){
+						self.settings.onClose.call(self);
 					});
-				});
+				} else if (this.settings.display == 'tooltip') {
+					this.$overlay.fadeOut(this.settings.overlayHideSpeed, function(){
+						self.$trigger.css({
+							position: self._triggerZIndexBackup.position,
+							zIndex: self._triggerZIndexBackup.zIndex
+						});
+						self.settings.onClose.call(self);
+					});
+				}
 			}
 
 			// Close opened children
@@ -509,8 +512,8 @@
 
 			if (this.settings.cssAnimations && browserSupportsCSSAnimations) {
 				this.$container
-					.off(browserCSSAnimationVendor + 'AnimationEnd')
-					.on(browserCSSAnimationVendor + 'AnimationEnd', onContainerFadeIn)
+					.off(animationEnd)
+					.on(animationEnd, onContainerFadeIn)
 					.show()
 					.css({
 						animationDuration: this.settings.showSpeed + 'ms',

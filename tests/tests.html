@@ -4,6 +4,7 @@
 	<title>Tests - kTip</title>
 	<meta charset="utf-8" />
 	<link rel="stylesheet" href="../kTip.css" />
+	<link rel="stylesheet" href="animate.css" />
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
 	<script src="../jquery.kTip.js"></script>
 	<script src="jquery.form.js"></script>
@@ -70,10 +71,10 @@
 <body>
 	<div id="base">
 		<p><span class="button default-call">Default call</span> <span class="button modal default-call">Default call</span></p>
-		<p><span class="button large-default-content">Large default content</span> <span class="button modal large-default-content">Large default content</span></p>
-		<p><span class="button default-overlay">Default overlay</span> <span class="button modal default-overlay">Default overlay</span></p>
+		<p><span class="button css-animation">CSS animation</span> <span class="button modal css-animation">CSS animation</span></p>
+		<p><span class="button infinite">Infinite</span> <span class="button auto-trigger">Auto-trigger</span></p>
 		<p><span class="button black-overlay">Black overlay</span> <span class="button modal black-overlay">Black overlay</span></p>
-		<p><span class="button auto-trigger">Auto-trigger</span></p>
+		<p><span class="button large-default-content">Large default content</span> <span class="button modal large-default-content">Large default content</span></p>
 		<p><span class="button block-close">Block close</span> <span class="button modal block-close">Block close</span></p>
 		<p><span class="button slow">Slow</span> <span class="button modal slow">Slow</span></p>
 		<p><span class="button modal grow">Grow</span></p>
@@ -83,7 +84,6 @@
 		<p><span class="button default-form">Default form</span> <span class="button modal default-form">Default form</span></p>
 		<p><span class="button ajax-form">Ajax form</span> <span class="button modal ajax-form">Ajax form</span></p>
 		<p><span class="button file-upload">File upload</span> <span class="button modal file-upload">File upload</span></p>
-		<p><span class="button infinite">Infinite</span></p>
 	</div>
 
 <script>
@@ -123,21 +123,28 @@
 	// Default call
 	test('.default-call', ["Default call"]);
 
-	// Large default content
-	test('.large-default-content', [
-		(new Array(500)).join("Large default content "),
+	// CSS animation
+	test('.css-animation', ["Custom show/hide CSS animation.<br />Degrades to fadeIn/fadeOut when not available (IE < 10)", {
+		showAnimation: 'swing',
+		showSpeed: 1000,
+		hideAnimation: 'hinge',
+		hideSpeed: 2000
+	}]);
+
+	// Infinite
+	test('.infinite', [
 		{
-			css: {
-				maxWidth: 600
+			ajax: {
+				url: 'infinite.php'
 			}
 		}
 	]);
 
-	// Default overlay
-	test('.default-overlay', [
-		"Default overlay",
+	// Auto trigger
+	test('.auto-trigger', [
+		"Auto trigger",
 		{
-			overlay: true
+			auto: true
 		}
 	]);
 
@@ -150,11 +157,13 @@
 		}
 	]);
 
-	// Auto trigger
-	test('.auto-trigger', [
-		"Auto trigger",
+	// Large default content
+	test('.large-default-content', [
+		(new Array(500)).join("Large default content "),
 		{
-			auto: true
+			css: {
+				maxWidth: 600
+			}
 		}
 	]);
 
@@ -237,15 +246,6 @@
 		{
 			ajax: {
 				url: 'file-upload.php'
-			}
-		}
-	]);
-
-	// Infinite
-	test('.infinite', [
-		{
-			ajax: {
-				url: 'infinite.php'
 			}
 		}
 	]);

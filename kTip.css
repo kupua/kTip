@@ -55,7 +55,7 @@ body { overflow-y: scroll; }
 	padding: 8px 10px;
 }
 
-/*---[ Animations ]---------------------------------------------------------- */
+/*---[ Animations (daneden.me/animate) ]------------------------------------- */
 
 @-webkit-keyframes kTip-fadeIn {
 	  0% { opacity: 0; }
@@ -77,6 +77,50 @@ body { overflow-y: scroll; }
 	100% { opacity: 1; }
 }
 
+@-webkit-keyframes kTip-fadeInDown {
+	0% {
+		opacity: 0;
+		-webkit-transform: translateY(-20px);
+	}
+	100% {
+		opacity: 1;
+		-webkit-transform: translateY(0);
+	}
+}
+
+@-moz-keyframes kTip-fadeInDown {
+	0% {
+		opacity: 0;
+		-moz-transform: translateY(-20px);
+	}
+	100% {
+		opacity: 1;
+		-moz-transform: translateY(0);
+	}
+}
+
+@-o-keyframes kTip-fadeInDown {
+	0% {
+		opacity: 0;
+		-o-transform: translateY(-20px);
+	}
+	100% {
+		opacity: 1;
+		-o-transform: translateY(0);
+	}
+}
+
+@keyframes kTip-fadeInDown {
+	0% {
+		opacity: 0;
+		transform: translateY(-20px);
+	}
+	100% {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
 @-webkit-keyframes kTip-fadeOut {
 	  0% { opacity: 1; }
 	100% { opacity: 0; }
@@ -95,4 +139,48 @@ body { overflow-y: scroll; }
 @keyframes kTip-fadeOut {
 	  0% { opacity: 1; }
 	100% { opacity: 0; }
+}
+
+@-webkit-keyframes kTip-fadeOutDown {
+	0% {
+		opacity: 1;
+		-webkit-transform: translateY(0);
+	}
+	100% {
+		opacity: 0;
+		-webkit-transform: translateY(20px);
+	}
+}
+
+@-moz-keyframes kTip-fadeOutDown {
+	0% {
+		opacity: 1;
+		-moz-transform: translateY(0);
+	}
+	100% {
+		opacity: 0;
+		-moz-transform: translateY(20px);
+	}
+}
+
+@-o-keyframes kTip-fadeOutDown {
+	0% {
+		opacity: 1;
+		-o-transform: translateY(0);
+	}
+	100% {
+		opacity: 0;
+		-o-transform: translateY(20px);
+	}
+}
+
+@keyframes kTip-fadeOutDown {
+	0% {
+		opacity: 1;
+		transform: translateY(0);
+	}
+	100% {
+		opacity: 0;
+		transform: translateY(20px);
+	}
 }
