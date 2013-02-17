@@ -1253,7 +1253,11 @@
 
 			//---[ Apply changes ]--------------------------------------------//
 
-			this.$container.css(pos);
+			this.$container.css({
+				top: Math.round(pos.top),
+				left: Math.round(pos.left),
+				position: position
+			});
 		}
 	};
 
