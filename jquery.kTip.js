@@ -277,6 +277,21 @@
 			return allChildrenClosed;
 		},
 
+		modalContainerSwitch: function(enable) {
+			$('body').css({
+				marginRight: enable ? browserScrollbarWidth : '',
+				overflow: enable ? 'hidden' : ''
+			});
+
+			if (enable) {
+				this.$container.parent().show();
+				this.settings.modal.onDisableScroll.call(this);
+			} else {
+				this.$container.parent().hide();
+				this.settings.modal.onRestoreScroll.call(this);
+			}
+		},
+
 		open: function(delay) {
 			var self = this;
 			this._show = true;
@@ -347,12 +362,7 @@
 				self.$container.hide();
 
 				if (self.settings.display == 'modal') {
-					self.$container.parent().hide();
-					$('body').css({
-						marginRight: '',
-						overflow: ''
-					});
-					self.settings.modal.onRestoreScroll.call(self);
+					self.modalContainerSwitch(false);
 				}
 
 				// If set to be destroyed, remove the content and bindings,
@@ -484,11 +494,7 @@
 
 			if (this.settings.overlay) {
 				if (this.settings.display == 'modal') {
-					$('body').css({
-						marginRight: browserScrollbarWidth,
-						overflow: 'hidden'
-					});
-					this.settings.modal.onDisableScroll.call(this);
+					this.modalContainerSwitch(true);
 					this.$overlay.fadeIn(this.settings.overlayShowSpeed);
 				} else {
 					this.$overlay.fadeIn(this.settings.overlayShowSpeed);
@@ -500,10 +506,6 @@
 				self.setFocus();
 				self.settings.onShow.call(self);
 			};
-
-			if (self.settings.display == 'modal' && self.settings.overlay) {
-				self.$container.parent().show();
-			}
 
 			// Set correct position before showing
 			self.$container.css('visibility', 'hidden').show();
@@ -740,6 +742,7 @@
 								width: '100%',
 								zIndex: this.settings.zIndexContainer
 							})
+							.hide()
 							.appendTo('body')
 						: 'body')
 					.on('mouseup', function(e){

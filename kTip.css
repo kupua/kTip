@@ -8,6 +8,10 @@
 html { overflow-y: visible !important; }
 body { overflow-y: scroll; }
 
+.kTip-container {
+	-webkit-backface-visibility: hidden; /* WebKit fix for CSS animations */
+}
+
 /*---[ Styles ]---------------------------------------------------------------*/
 
 /* Style: default modal */
