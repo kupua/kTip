@@ -183,6 +183,9 @@
 		// Apply options
 		$.extend(true, this.settings, options);
 
+		// Help detect children
+		this.settings.tooltip.positionSource.data('kTip', this);
+
 		// Internal jQuery elements
 		this.$trigger = $(trigger);
 		this.$container = null;
@@ -722,7 +725,7 @@
 
 			if (!this.$container) {
 				this.$container = $('<div/>')
-					.data('kTip', this)
+					.data('kTip', this) // Help detect children
 					.addClass('kTip-container')
 					.addClass(this.settings.extraClass)
 					.css({
@@ -732,7 +735,7 @@
 					.hide()
 					.appendTo(this.settings.display == 'modal' && this.settings.overlay
 						? $('<div/>')
-							.data('kTip', this) // Used to detect children
+							.data('kTip', this) // Help detect children
 							.css({
 								height: '100%',
 								left: 0,
@@ -814,7 +817,7 @@
 
 			if (this.settings.overlay && !this.$overlay) {
 				this.$overlay = $('<div/>')
-					.data('kTip', this) // Used to detect children
+					.data('kTip', this) // Help detect children
 					.attr('class', 'kTip-overlay')
 					.css({
 						background: this.settings.overlayColor,

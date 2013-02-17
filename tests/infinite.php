@@ -1,5 +1,7 @@
 <?php
 
+header("Cache-Control: no-cache, must-revalidate"); // IE fix
+
 $unique_id = rand(0, 10000);
 
 ?>
