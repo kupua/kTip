@@ -188,6 +188,22 @@
 		// Help detect children
 		this.settings.tooltip.positionSource.data('kTip', this);
 
+		// Convert overlay color from hex to rgb (http://stackoverflow.com/a/5624139)
+		this.settings.overlayColor = function(hex) {
+			// Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+			var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+			hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+				return r + r + g + g + b + b;
+			});
+
+			var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+			return result ? {
+				r: parseInt(result[1], 16),
+				g: parseInt(result[2], 16),
+				b: parseInt(result[3], 16)
+			} : null;
+		}(this.settings.overlayColor);
+
 		// Internal jQuery elements
 		this.$trigger = $(trigger);
 		this.$container = null;
@@ -391,18 +407,30 @@
 			}
 
 			if (this.settings.overlay) {
-				if (this.settings.display == 'modal') {
-					this.$overlay.fadeOut(this.settings.overlayHideSpeed, function(){
-						self.settings.onClose.call(self);
-					});
-				} else if (this.settings.display == 'tooltip') {
-					this.$overlay.fadeOut(this.settings.overlayHideSpeed, function(){
+				var onOverlayFadeOut = function() {
+					// Hide after a CSS animation
+					self.$overlay.hide();
+
+					if (self.settings.display == 'tooltip') {
 						self.$trigger.css({
 							position: self._triggerZIndexBackup.position,
 							zIndex: self._triggerZIndexBackup.zIndex
 						});
-						self.settings.onClose.call(self);
-					});
+					}
+					self.settings.onClose.call(self);
+				};
+
+				if (this.settings.cssAnimations && browserSupportsCSSAnimations) {
+					this.$overlay
+						.off(animationEnd)
+						.on(animationEnd, onOverlayFadeOut)
+						.css({
+							animationDuration: this.settings.overlayHideSpeed + 'ms',
+							animationFillMode: 'both',
+							animationName: 'kTip-fadeOut'
+						});
+				} else {
+					this.$overlay.fadeOut(this.settings.overlayHideSpeed, onOverlayFadeOut);
 				}
 			}
 
@@ -489,7 +517,17 @@
 			if (this.settings.overlay) {
 				if (this.settings.display == 'modal') {
 					this.modalContainerSwitch(true);
-					this.$overlay.fadeIn(this.settings.overlayShowSpeed);
+				}
+
+				if (this.settings.cssAnimations && browserSupportsCSSAnimations) {
+					this.$overlay
+						.off(animationEnd)
+						.show()
+						.css({
+							animationDuration: this.settings.overlayShowSpeed + 'ms',
+							animationFillMode: 'both',
+							animationName: 'kTip-fadeIn'
+						});
 				} else {
 					this.$overlay.fadeIn(this.settings.overlayShowSpeed);
 				}
@@ -808,10 +846,16 @@
 					.data('kTip', this) // Help detect children
 					.attr('class', 'kTip-overlay')
 					.css({
-						background: this.settings.overlayColor,
+						background: (this.settings.cssAnimations && browserSupportsCSSAnimations)
+							? 'rgba('
+								+ this.settings.overlayColor.r + ', '
+								+ this.settings.overlayColor.g + ', '
+								+ this.settings.overlayColor.b + ', '
+								+ this.settings.overlayOpacity + ')'
+							: this.settings.overlayColor,
 						height: '100%', // 100% doesn't work properly on touchscreens
 						left: 0,
-						opacity: this.settings.overlayOpacity,
+						opacity: (this.settings.cssAnimations && browserSupportsCSSAnimations) ? null : this.settings.overlayOpacity,
 						position: 'fixed',
 						top: 0,
 						width: '100%', // 100% doesn't work properly on touchscreens
