@@ -189,7 +189,7 @@
 		this.settings.tooltip.positionSource.data('kTip', this);
 
 		// Convert overlay color from hex to rgb (http://stackoverflow.com/a/5624139)
-		this.settings.overlayColor = function(hex) {
+		this.settings.overlayColorRGB = function(hex) {
 			// Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
 			var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
 			hex = hex.replace(shorthandRegex, function(m, r, g, b) {
@@ -399,7 +399,7 @@
 					.on(animationEnd, onContainerFadeOut)
 					.css({
 						animationDuration: this.settings.hideSpeed + 'ms',
-						animationFillMode: 'both',
+						// animationFillMode: 'both',
 						animationName: this.settings.hideAnimation
 					});
 			} else {
@@ -426,7 +426,7 @@
 						.on(animationEnd, onOverlayFadeOut)
 						.css({
 							animationDuration: this.settings.overlayHideSpeed + 'ms',
-							animationFillMode: 'both',
+							// animationFillMode: 'both',
 							animationName: 'kTip-fadeOut'
 						});
 				} else {
@@ -525,7 +525,7 @@
 						.show()
 						.css({
 							animationDuration: this.settings.overlayShowSpeed + 'ms',
-							animationFillMode: 'both',
+							// animationFillMode: 'both',
 							animationName: 'kTip-fadeIn'
 						});
 				} else {
@@ -551,7 +551,7 @@
 					.show()
 					.css({
 						animationDuration: this.settings.showSpeed + 'ms',
-						animationFillMode: 'both',
+						// animationFillMode: 'both',
 						animationName: this.settings.showAnimation
 					});
 			} else {
@@ -848,9 +848,9 @@
 					.css({
 						background: (this.settings.cssAnimations && browserSupportsCSSAnimations)
 							? 'rgba('
-								+ this.settings.overlayColor.r + ', '
-								+ this.settings.overlayColor.g + ', '
-								+ this.settings.overlayColor.b + ', '
+								+ this.settings.overlayColorRGB.r + ', '
+								+ this.settings.overlayColorRGB.g + ', '
+								+ this.settings.overlayColorRGB.b + ', '
 								+ this.settings.overlayOpacity + ')'
 							: this.settings.overlayColor,
 						height: '100%', // 100% doesn't work properly on touchscreens
