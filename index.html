@@ -1,174 +1,259 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>mgExternal Test file</title>
+	<title>Tests - kTip</title>
+
 	<meta charset="utf-8" />
-	<link rel="stylesheet" href="//twitter.github.com/bootstrap/1.4.0/bootstrap.min.css">
-	<link rel="stylesheet" href="mgExternal.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+	<link rel="stylesheet" href="//raw.github.com/kupua/kTip/master/kTip.css" />
+	<link rel="stylesheet" href="animate.css" />
+
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script src="//raw.github.com/kupua/kTip/master/jquery.kTip.js"></script>
+	<script src="jquery.form.js"></script>
+
 	<style>
+		* {
+			margin: 0;
+			padding: 0;
+		}
+
 		body {
 			background-color: #eee;
+			font: 13px/1.5 arial, sans-serif;
+			padding: 30px 15px;
 		}
+
+		@media screen and (max-width: 767px) {
+			body {
+				padding: 5px 10px;
+			}
+		}
+
+		h1 {
+			font-size: 30px;
+			margin-bottom: 0;
+		}
+
+		hr {
+			border: 0;
+			border-bottom: 1px solid #ddd;
+			margin: 20px 0;
+		}
+
+		a {
+			color: #06c;
+			text-decoration: none;
+		}
+
+		a:hover {
+			text-decoration: underline;
+		}
+
+		p {
+			margin-bottom: 10px;
+		}
+
 		#base {
 			background-color: #fff;
-			height: 3000px;
-			margin: 50px auto;
+			margin: 5px auto;
 			padding: 30px;
-			width: 500px;
+			max-width: 400px;
 		}
+
+		@media screen and (max-width: 767px) {
+			#base {
+				padding: 15px;
+			}
+		}
+
 		.faded {
 			color: #999;
 		}
+
 		.info {
 			color: #484;
 		}
+
 		.alert {
 			color: #c00;
 		}
+
+		.button {
+			background-color: #38c;
+			border-radius: 5px;
+			color: #fff;
+			cursor: pointer;
+			display: inline-block;
+			font-size: 14px;
+			font-weight: bold;
+			padding: 10px 20px;
+			text-decoration: none;
+		}
+
+		.button + .button {
+			margin-left: 5px;
+		}
+
+		.button:hover {
+			background-color: #16a;
+			text-decoration: none;
+		}
+
+		.button.modal {
+			background-color: #c33;
+			float: right;
+		}
+
+		.button.modal:hover {
+			background-color: #a11;
+		}
+
+		.button.github {
+			background-color: #eee;
+			color: #333;
+			font-size: 16px;
+			padding: 14px 24px;
+		}
+
+		.button.github:hover {
+			background-color: #ddd;
+		}
+
+		.button.active {
+			background-color: #000;
+		}
+
+		.button.disabled {
+			background-color: #eee;
+			color: #888;
+			cursor: not-allowed;
+		}
 	</style>
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-	<script src="jquery.mgExternal.min.js"></script>
 </head>
 <body>
-
-<div id="base">
-	<h1><a href="https://github.com/celtric/mgExternal">mgExternal</a> Test file</h1>
-	<hr />
-	<p>This is a test file.</p>
-	<h4>Default modal</h4>
-	<p>
-		<a class="btn" id="test-default-modal">Open modal</a>
-		<a class="btn" id="test-default-modal-long" style="margin-left:5px;">Open long modal</a>
-	</p>
-	<p>
-		<a class="btn" id="test-default-modal-nooverlay">Open modal without overlay</a>
-		<a class="btn" id="test-default-modal-nooverlay-long" style="margin-left:5px;">Open long modal without overlay</a>
-	</p>
-	<h4>Default tooltip</h4>
-	<p><a class="btn" id="test-default-tooltip">Open tooltip</a></p>
-	<h4>Options menu</h4>
-	<p><a class="btn" id="test-options-menu">Open options menu</a> <a class="btn" id="test-options-menu-long" style="margin-left:5px;">Open options long menu</a></p>
-	<h4>Tooltip with overlay</h4>
-	<p><a class="btn" id="test-tooltip-overlay">Open tooltip with overlay</a></p>
-	<h4>Onload</h4>
-	<p><a class="btn" id="test-onload">Open onload example</a></p>
-</div>
+	<div id="base">
+		<h1><a href="https://github.com/kupua/kTip">kTip</a> test file</h1>
+		<hr />
+		<p style="text-align:center;"><a href="https://github.com/kupua/kTip" class="button github">View on GitHub &rsaquo;</a></p>
+		<hr />
+		<p><strong style="color:#38c;">BLUE</strong> buttons open tooltips, <strong style="color:#c33;">RED</strong> ones open modal windows.</p>
+		<p><span class="button default-call">Default call</span> <span class="button modal default-call">Default call</span></p>
+		<p><span class="button css-animation">CSS animation</span> <span class="button modal css-animation">CSS animation</span></p>
+		<p><span class="button infinite">Infinite</span> <span class="button modal infinite">Infinite</span></p>
+		<p><span class="button black-overlay">Black overlay</span> <span class="button modal black-overlay">Black overlay</span></p>
+		<p><span class="button large-content">Large content</span> <span class="button modal large-content">Large content</span></p>
+		<p><span class="button block-close">Block close</span> <span class="button modal block-close">Block close</span></p>
+		<p><span class="button ajax-form">Ajax form</span> <span class="button modal ajax-form">Ajax form</span></p>
+		<p><span class="button file-upload">File upload</span> <span class="button modal file-upload">File upload</span></p>
+	</div>
 
 <script>
+(function(){
 
-$(document).live('a[href="#"]').click(function(e){
-	if (e.which == 1)
-		e.preventDefault();
-});
-
-$('#test-default-modal').mgExternal(
-	'<p>This is a modal default call. <a href="#" class="mgExternal-close">Close</a></p>'
-	+ '<p class="faded">You can press ESC or click outside to close this window.</p>', {
-	css: {
-		padding: 30
+	function test(selector, args) {
+		$(selector).each(function(){
+			var $elem = $(this);
+			if ($elem.hasClass('modal')) {
+				if (typeof args[0] == 'object') {
+					$elem.kTip.apply($elem, $.extend(true, [{display: 'modal', css: {padding: '25px 25px 15px'}}], args));
+				} else {
+					$elem.kTip.apply($elem, $.extend(true, [null, {display: 'modal', css: {padding: '25px 25px 15px'}}], args));
+				}
+			} else {
+				if (typeof args[0] == 'object') {
+					$elem.kTip.apply($elem, $.extend(true, [{css: {padding: '25px 25px 15px'}}], args));
+				} else {
+					$elem.kTip.apply($elem, $.extend(true, [null, {css: {padding: '25px 25px 15px'}}], args));
+				}
+			}
+		});
 	}
-});
 
-$('#test-default-modal-long').mgExternal(
-	'<p>This is a modal default call. <a href="#" class="mgExternal-close">Close</a></p>'
-	+ '<p class="faded">You can press ESC or click outside to close this window.</p>'
-	+ '<p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo. Quisque sit amet est et sapien ullamcorper pharetra. Vestibulum erat wisi, condimentum sed, commodo vitae, ornare sit amet, wisi. Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui. Donec non enim in turpis pulvinar facilisis. Ut felis. Praesent dapibus, neque id cursus faucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. Aliquam erat volutpat. Nam dui mi, tincidunt quis, accumsan porttitor, facilisis luctus, metus</p>'
-	+ '<p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo. Quisque sit amet est et sapien ullamcorper pharetra. Vestibulum erat wisi, condimentum sed, commodo vitae, ornare sit amet, wisi. Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui. Donec non enim in turpis pulvinar facilisis. Ut felis. Praesent dapibus, neque id cursus faucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. Aliquam erat volutpat. Nam dui mi, tincidunt quis, accumsan porttitor, facilisis luctus, metus</p>'
-	+ '<p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo. Quisque sit amet est et sapien ullamcorper pharetra. Vestibulum erat wisi, condimentum sed, commodo vitae, ornare sit amet, wisi. Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui. Donec non enim in turpis pulvinar facilisis. Ut felis. Praesent dapibus, neque id cursus faucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. Aliquam erat volutpat. Nam dui mi, tincidunt quis, accumsan porttitor, facilisis luctus, metus</p>'
-	+ '<p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo. Quisque sit amet est et sapien ullamcorper pharetra. Vestibulum erat wisi, condimentum sed, commodo vitae, ornare sit amet, wisi. Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui. Donec non enim in turpis pulvinar facilisis. Ut felis. Praesent dapibus, neque id cursus faucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. Aliquam erat volutpat. Nam dui mi, tincidunt quis, accumsan porttitor, facilisis luctus, metus</p>'
-	+ '<p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo. Quisque sit amet est et sapien ullamcorper pharetra. Vestibulum erat wisi, condimentum sed, commodo vitae, ornare sit amet, wisi. Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui. Donec non enim in turpis pulvinar facilisis. Ut felis. Praesent dapibus, neque id cursus faucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. Aliquam erat volutpat. Nam dui mi, tincidunt quis, accumsan porttitor, facilisis luctus, metus</p>', {
-	css: {
-		padding: 30,
-		width: 450
-	}
-});
+	// Default call
+	test('.default-call', [
+		'<p>This is a default call. <a href="#" class="kTip-close">Close</a></p>'
+		+ '<p class="info"><strong>Hint:</strong> try to resize the window.</p>'
+		+ '<p class="faded">You can press ESC or click outside to close this window.</p>'
+	]);
 
-$('#test-default-modal-nooverlay').mgExternal(
-	'<p>This is a modal default call. <a href="#" class="mgExternal-close">Close</a></p>'
-	+ '<p class="faded">You can press ESC or click outside to close this window.</p>', {
-	overlayShow: false,
-	css: {
-		padding: 30
-	}
-});
+	// CSS animation
+	test('.css-animation', [
+		'<p>Custom show/hide CSS animation. <a href="#" class="kTip-close">Close</a></p>'
+		+ '<p class="faded">Degrades to fadeIn/fadeOut when not available (IE < 10).</p>',
+		{
+			showAnimation: 'swing',
+			showSpeed: 1000,
+			hideAnimation: 'hinge',
+			hideSpeed: 2000
+		}
+	]);
 
-$('#test-default-modal-nooverlay-long').mgExternal(
-	'<p>This is a modal default call. <a href="#" class="mgExternal-close">Close</a></p>'
-	+ '<p class="faded">You can press ESC or click outside to close this window.</p>'
-	+ '<p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo. Quisque sit amet est et sapien ullamcorper pharetra. Vestibulum erat wisi, condimentum sed, commodo vitae, ornare sit amet, wisi. Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui. Donec non enim in turpis pulvinar facilisis. Ut felis. Praesent dapibus, neque id cursus faucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. Aliquam erat volutpat. Nam dui mi, tincidunt quis, accumsan porttitor, facilisis luctus, metus</p>'
-	+ '<p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo. Quisque sit amet est et sapien ullamcorper pharetra. Vestibulum erat wisi, condimentum sed, commodo vitae, ornare sit amet, wisi. Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui. Donec non enim in turpis pulvinar facilisis. Ut felis. Praesent dapibus, neque id cursus faucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. Aliquam erat volutpat. Nam dui mi, tincidunt quis, accumsan porttitor, facilisis luctus, metus</p>'
-	+ '<p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo. Quisque sit amet est et sapien ullamcorper pharetra. Vestibulum erat wisi, condimentum sed, commodo vitae, ornare sit amet, wisi. Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui. Donec non enim in turpis pulvinar facilisis. Ut felis. Praesent dapibus, neque id cursus faucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. Aliquam erat volutpat. Nam dui mi, tincidunt quis, accumsan porttitor, facilisis luctus, metus</p>'
-	+ '<p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo. Quisque sit amet est et sapien ullamcorper pharetra. Vestibulum erat wisi, condimentum sed, commodo vitae, ornare sit amet, wisi. Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui. Donec non enim in turpis pulvinar facilisis. Ut felis. Praesent dapibus, neque id cursus faucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. Aliquam erat volutpat. Nam dui mi, tincidunt quis, accumsan porttitor, facilisis luctus, metus</p>'
-	+ '<p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo. Quisque sit amet est et sapien ullamcorper pharetra. Vestibulum erat wisi, condimentum sed, commodo vitae, ornare sit amet, wisi. Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui. Donec non enim in turpis pulvinar facilisis. Ut felis. Praesent dapibus, neque id cursus faucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. Aliquam erat volutpat. Nam dui mi, tincidunt quis, accumsan porttitor, facilisis luctus, metus</p>', {
-	overlayShow: false,
-	css: {
-		padding: 30,
-		width: 450
-	}
-});
+	// Infinite
+	test('.infinite', [
+		{
+			ajax: {
+				url: 'infinite.php'
+			}
+		}
+	]);
 
-$('#test-default-tooltip').mgExternal(
-	'<p>This is a tooltip default call. <a href="#" class="mgExternal-close">Close</a></p>'
-	+ '<p class="info"><strong>Hint:</strong> try to resize the window.</p>'
-	+ '<p class="faded">You can press ESC or click outside to close this window.</p>', {
-	display: 'tooltip',
-	css: {
-		padding: 15
-	}
-});
+	// Black overlay
+	test('.black-overlay', [
+		'<p>Tooltips can also have an overlay, and the color can be changed. <a href="#" class="kTip-close">Close</a></p>'
+		+ '<p class="faded">Currently, only hex values are accepted.</p>',
+		{
+			overlay: true,
+			overlayColor: '#000'
+		}
+	]);
 
-$('#test-options-menu').mgExternal({
-	display: 'tooltip',
-	extraClass: 'mgE-tooltip mgE-options',
-	ajaxUrl: 'test_ajax_options.html',
-	tooltip: {
-		arrowSize: 0,
-		position: 'bottom left'
-	}
-});
+	// Large default content
+	test('.large-content', [
+		'<p>This is a sample window with a lot of text. <a href="#" class="kTip-close">Close</a></p>'
+		+ '<p class="faded">You can press ESC or click outside to close this window.</p>'
+		+ (new Array(10)).join('<p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo. Quisque sit amet est et sapien ullamcorper pharetra. Vestibulum erat wisi, condimentum sed, commodo vitae, ornare sit amet, wisi. Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui. Donec non enim in turpis pulvinar facilisis. Ut felis. Praesent dapibus, neque id cursus faucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. Aliquam erat volutpat. Nam dui mi, tincidunt quis, accumsan porttitor, facilisis luctus, metus</p>'),
+		{
+			css: {
+				maxWidth: 600
+			}
+		}
+	]);
 
-$('#test-options-menu-long').mgExternal({
-	display: 'tooltip',
-	extraClass: 'mgE-tooltip mgE-options',
-	ajaxUrl: 'test_ajax_options_long.html',
-	tooltip: {
-		arrowSize: 0,
-		position: 'bottom left'
-	}
-});
+	// Block close
+	test('.block-close', [
+		'<p>This window can only be closed with a custom close button, like this one &rarr; <a href="#" class="kTip-close">Close</a></p>'
+		+ '<p class="faded">No ESC or outside click to close.</p>',
+		{
+			outsideClose: false,
+			escClose: false
+		}
+	]);
 
-$('#test-tooltip-overlay').mgExternal(
-	'<div class="modal-header" style="background-color:#fff;">'
-	+ '<h3>Tooltip with overlay</h3>'
-	+ '</div>'
-	+ '<div class="modal-body" style="background-color:#fff;">'
-	+ '<p>This is a tooltip with a white overlay.</p>'
-	+ '<p class="alert">It can\'t be closed by clicking outside or pressing ESC.</p>'
-	+ '</div>'
-	+ '<div class="modal-footer">'
-	+ '<a class="btn primary" href="#">Primary</a>'
-	+ '<a class="btn secondary mgExternal-close" href="#">Close</a>'
-	+ '</div>', {
-	display: 'tooltip',
-	overlayShow: true,
-	outsideClose: false,
-	escClose: false,
-	css: {
-		backgroundColor: '#f5f5f5'
-	},
-	tooltip: {
-		position: 'right bottom'
-	}
-});
+	// Ajax form
+	test('.ajax-form', [
+		{
+			ajax: {
+				url: 'form.php',
+				data: {
+					ajax: 'true'
+				}
+			}
+		}
+	]);
 
-$('#test-onload').mgExternal({
-	ajaxUrl: 'test_ajax_onload.html',
-	css: {
-		padding: 30
-	}
-});
+	// File upload
+	test('.file-upload', [
+		{
+			ajax: {
+				url: 'file-upload.php'
+			}
+		}
+	]);
 
+})();
 </script>
-
 </body>
 </html>
