@@ -144,7 +144,6 @@
 		<p><strong style="color:#38c;">BLUE</strong> buttons open tooltips, <strong style="color:#c33;">RED</strong> ones open modal windows.</p>
 		<p><span class="button default-call">Default call</span> <span class="button modal default-call">Default call</span></p>
 		<p><span class="button css-animation">CSS animation</span> <span class="button modal css-animation">CSS animation</span></p>
-		<p><span class="button infinite">Infinite</span> <span class="button modal infinite">Infinite</span></p>
 		<p><span class="button black-overlay">Black overlay</span> <span class="button modal black-overlay">Black overlay</span></p>
 		<p><span class="button large-content">Large content</span> <span class="button modal large-content">Large content</span></p>
 		<p><span class="button block-close">Block close</span> <span class="button modal block-close">Block close</span></p>
@@ -193,15 +192,6 @@
 		}
 	]);
 
-	// Infinite
-	test('.infinite', [
-		{
-			ajax: {
-				url: 'infinite.php'
-			}
-		}
-	]);
-
 	// Black overlay
 	test('.black-overlay', [
 		'<p>Tooltips can also have an overlay, and the color can be changed. <a href="#" class="kTip-close">Close</a></p>'
@@ -231,27 +221,6 @@
 		{
 			outsideClose: false,
 			escClose: false
-		}
-	]);
-
-	// Ajax form
-	test('.ajax-form', [
-		{
-			ajax: {
-				url: 'form.php',
-				data: {
-					ajax: 'true'
-				}
-			}
-		}
-	]);
-
-	// File upload
-	test('.file-upload', [
-		{
-			ajax: {
-				url: 'file-upload.php'
-			}
 		}
 	]);
 
