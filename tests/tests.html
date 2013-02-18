@@ -22,7 +22,7 @@
 
 		body {
 			background-color: #eee;
-			font: 14px/1.5 arial, sans-serif;
+			font: 13px/1.5 arial, sans-serif;
 			padding: 30px 15px;
 		}
 
@@ -53,7 +53,7 @@
 		}
 
 		p {
-			margin-bottom: 15px;
+			margin-bottom: 10px;
 		}
 
 		#base {
@@ -69,12 +69,25 @@
 			}
 		}
 
+		.faded {
+			color: #999;
+		}
+
+		.info {
+			color: #484;
+		}
+
+		.alert {
+			color: #c00;
+		}
+
 		.button {
 			background-color: #38c;
 			border-radius: 5px;
 			color: #fff;
 			cursor: pointer;
 			display: inline-block;
+			font-size: 14px;
 			font-weight: bold;
 			padding: 10px 20px;
 			text-decoration: none;
@@ -130,15 +143,9 @@
 		<p><span class="button default-call">Default call</span> <span class="button modal default-call">Default call</span></p>
 		<p><span class="button css-animation">CSS animation</span> <span class="button modal css-animation">CSS animation</span></p>
 		<p><span class="button infinite">Infinite</span> <span class="button modal infinite">Infinite</span></p>
-		<p><span class="button auto-trigger">Auto-trigger</span></p>
 		<p><span class="button black-overlay">Black overlay</span> <span class="button modal black-overlay">Black overlay</span></p>
 		<p><span class="button large-content">Large content</span> <span class="button modal large-content">Large content</span></p>
 		<p><span class="button block-close">Block close</span> <span class="button modal block-close">Block close</span></p>
-		<p><span class="button slow">Slow</span> <span class="button modal slow">Slow</span></p>
-		<p><span class="button ajax-html">Ajax html</span> <span class="button modal ajax-html">Ajax html</span></p>
-		<p><span class="button ajax-json">Ajax json</span> <span class="button modal ajax-json">Ajax json</span></p>
-		<p><span class="button ajax-error">Ajax error</span> <span class="button modal ajax-error">Ajax error</span></p>
-		<p><span class="button default-form">Default form</span> <span class="button modal default-form">Default form</span></p>
 		<p><span class="button ajax-form">Ajax form</span> <span class="button modal ajax-form">Ajax form</span></p>
 		<p><span class="button file-upload">File upload</span> <span class="button modal file-upload">File upload</span></p>
 	</div>
@@ -146,47 +153,43 @@
 <script>
 (function(){
 
-	/*$(document).on('submit', 'form', function(e){
-		e.preventDefault();
-		$(this).ajaxSubmit({
-			url: 'post.php',
-			dataType: 'json',
-			success: function(data) {
-				alert(data.message);
-			}
-			//target: 'myResultsDiv'
-		});
-	});*/
-
 	function test(selector, args) {
 		$(selector).each(function(){
 			var $elem = $(this);
 			if ($elem.hasClass('modal')) {
 				if (typeof args[0] == 'object') {
-					$elem.kTip.apply($elem, $.extend(true, [{display: 'modal', css: {padding: 30}}], args));
+					$elem.kTip.apply($elem, $.extend(true, [{display: 'modal', css: {padding: '25px 25px 15px'}}], args));
 				} else {
-					$elem.kTip.apply($elem, $.extend(true, [null, {display: 'modal', css: {padding: 30}}], args));
+					$elem.kTip.apply($elem, $.extend(true, [null, {display: 'modal', css: {padding: '25px 25px 15px'}}], args));
 				}
 			} else {
 				if (typeof args[0] == 'object') {
-					$elem.kTip.apply($elem, $.extend(true, [{css: {padding: 15}}], args));
+					$elem.kTip.apply($elem, $.extend(true, [{css: {padding: '25px 25px 15px'}}], args));
 				} else {
-					$elem.kTip.apply($elem, $.extend(true, [null, {css: {padding: 15}}], args));
+					$elem.kTip.apply($elem, $.extend(true, [null, {css: {padding: '25px 25px 15px'}}], args));
 				}
 			}
 		});
 	}
 
 	// Default call
-	test('.default-call', ["Default call"]);
+	test('.default-call', [
+		'<p>This is a default call. <a href="#" class="kTip-close">Close</a></p>'
+		+ '<p class="info"><strong>Hint:</strong> try to resize the window.</p>'
+		+ '<p class="faded">You can press ESC or click outside to close this window.</p>'
+	]);
 
 	// CSS animation
-	test('.css-animation', ["Custom show/hide CSS animation.<br />Degrades to fadeIn/fadeOut when not available (IE < 10)", {
-		showAnimation: 'swing',
-		showSpeed: 1000,
-		hideAnimation: 'hinge',
-		hideSpeed: 2000
-	}]);
+	test('.css-animation', [
+		'<p>Custom show/hide CSS animation. <a href="#" class="kTip-close">Close</a></p>'
+		+ '<p class="faded">Degrades to fadeIn/fadeOut when not available (IE < 10).</p>',
+		{
+			showAnimation: 'swing',
+			showSpeed: 1000,
+			hideAnimation: 'hinge',
+			hideSpeed: 2000
+		}
+	]);
 
 	// Infinite
 	test('.infinite', [
@@ -197,17 +200,10 @@
 		}
 	]);
 
-	// Auto trigger
-	test('.auto-trigger', [
-		"Auto trigger",
-		{
-			auto: true
-		}
-	]);
-
 	// Black overlay
 	test('.black-overlay', [
-		"Black overlay",
+		'<p>Tooltips can also have an overlay, and the color can be changed. <a href="#" class="kTip-close">Close</a></p>'
+		+ '<p class="faded">Currently, only hex values are accepted.</p>',
 		{
 			overlay: true,
 			overlayColor: '#000'
@@ -216,7 +212,9 @@
 
 	// Large default content
 	test('.large-content', [
-		(new Array(500)).join("Large content "),
+		'<p>This is a sample window with a lot of text. <a href="#" class="kTip-close">Close</a></p>'
+		+ '<p class="faded">You can press ESC or click outside to close this window.</p>'
+		+ (new Array(10)).join('<p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo. Quisque sit amet est et sapien ullamcorper pharetra. Vestibulum erat wisi, condimentum sed, commodo vitae, ornare sit amet, wisi. Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui. Donec non enim in turpis pulvinar facilisis. Ut felis. Praesent dapibus, neque id cursus faucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. Aliquam erat volutpat. Nam dui mi, tincidunt quis, accumsan porttitor, facilisis luctus, metus</p>'),
 		{
 			css: {
 				maxWidth: 600
@@ -226,59 +224,12 @@
 
 	// Block close
 	test('.block-close', [
-		"<p>Block close <a href='#' class='kTip-close'>close</a></p><p>No ESC or outside click to close.</p>",
+		'<p>This window can only be closed with a custom close button, like this one &rarr; <a href="#" class="kTip-close">Close</a></p>'
+		+ '<p class="faded">No ESC or outside click to close.</p>',
 		{
 			outsideClose: false,
 			escClose: false
 		}
-	]);
-
-	// Slow
-	test('.slow', [
-		"Slow",
-		{
-			showDelay: 1000,
-			hideDelay: 1000,
-			showSpeed: 1000,
-			hideSpeed: 1000,
-			overlayShowSpeed: 1000,
-			overlayHideSpeed: 1000
-		}
-	]);
-
-	// Ajax html
-	test('.ajax-html', [
-		{
-			ajax: {
-				url: 'ajax.html'
-			}
-		}
-	]);
-
-	// Ajax json
-	test('.ajax-json', [
-		{
-			ajax: {
-				url: 'ajax.json'
-			}
-		}
-	]);
-
-	// Ajax error
-	test('.ajax-error', [
-		{
-			ajax: {
-				url: 'ajax.error'
-			}
-		}
-	]);
-
-	// Default form
-	test('.default-form', [
-		'<form method="post" action="ajax.html">\
-			<input name="text" type="text" />\
-			<input type="submit" />\
-		</form>'
 	]);
 
 	// Ajax form

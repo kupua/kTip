@@ -1,10 +1,3 @@
-Ajax <strong>html</strong> response
+<p>Ajax <strong>HTML</strong> response</p>
 
-<br /><a href="form.php" id="redirect">redirect</a>
-
-<script>
-	$('#redirect').on('click', function(e){
-		e.preventDefault();
-		$(this).parents('.kTip-container').kTip().redirect($(this).attr('href'));
-	});
-</script>
+<p><a href="form.php" class="kTip-redirect">Redirect to form</a></p>

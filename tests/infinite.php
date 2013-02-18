@@ -6,12 +6,12 @@ $unique_id = rand(0, 10000);
 
 ?>
 
-Infinite <a href="infinite.php" id="infinite-<?=$unique_id?>">tooltips</a>!
+<p>Infinite <a href="infinite.php" id="infinite-<?=$unique_id?>">tooltips</a>!</p>
 
 <script>
 	$('#infinite-<?=$unique_id?>').kTip({
 		css: {
-			padding: 15
+			padding: '25px 25px 15px'
 		}
 	});
 </script>

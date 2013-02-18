@@ -2,18 +2,20 @@
 
 	if (isset($_POST['identifier']) && $_POST['identifier'] == 'form-1') {
 		if (empty($_POST['text'])) {
-			echo "Please insert your name:<br />";
+			echo "<p class='alert'>Please insert your name:</p>";
 		} else {
-			echo "Success!";
+			echo "<p class='info'><strong>Hi ", htmlspecialchars($_POST['text'], ENT_QUOTES), "!</strong></p>";
 			goto form_2;
 		}
 	}
 
 ?>
 <form method="post">
-	<input type="hidden" name="identifier" value="form-1" />
-	<input type="text" name="text" />
-	<input type="submit" value="Form 1" />
+	<p>
+		<input type="hidden" name="identifier" value="form-1" />
+		<input type="text" name="text" />
+		<input type="submit" value="Form 1" />
+	</p>
 </form>
 
 <?php
@@ -22,19 +24,20 @@
 
 	if (isset($_POST['identifier']) && $_POST['identifier'] == 'form-2') {
 		if (empty($_POST['text'])) {
-			echo "Please insert your name:<br />";
+			echo "<p class='alert'>Please insert your name:</p>";
 		} else {
-			echo "Success!<br />";
+			echo "<p class='info'><strong>Hi ", htmlspecialchars($_POST['text'], ENT_QUOTES), "!</strong></p>";
 			goto redirect;
 		}
 	}
 
 ?>
-<form method="post" enctype="multipart/form-data">
-	<input type="hidden" name="identifier" value="form-2" />
-	<input type="text" name="text" />
-	<input type="file" name="file" />
-	<input type="submit" value="Form 2" />
+<form method="post">
+	<p>
+		<input type="hidden" name="identifier" value="form-2" />
+		<input type="text" name="text" />
+		<input type="submit" value="Form 2" />
+	</p>
 </form>
 
 <?php
@@ -43,4 +46,4 @@
 
 ?>
 
-<a href="ajax.html" class="kTip-redirect">redirect</a>
+<p><a href="ajax.html" class="kTip-redirect">Redirect</a></p>
