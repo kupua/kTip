@@ -1,5 +1,5 @@
 /**
- * kTip 0.0.14
+ * kTip 0.0.15
  * Based on mgExternal 1.0.30
  *
  * Copyright 2012 Ricard Osorio Mañanas
@@ -399,7 +399,7 @@
 					.on(animationEnd, onContainerFadeOut)
 					.css({
 						animationDuration: this.settings.hideSpeed + 'ms',
-						// animationFillMode: 'both',
+						animationFillMode: 'both',
 						animationName: this.settings.hideAnimation
 					});
 			} else {
@@ -426,7 +426,7 @@
 						.on(animationEnd, onOverlayFadeOut)
 						.css({
 							animationDuration: this.settings.overlayHideSpeed + 'ms',
-							// animationFillMode: 'both',
+							animationFillMode: 'both',
 							animationName: 'kTip-fadeOut'
 						});
 				} else {
@@ -525,7 +525,7 @@
 						.show()
 						.css({
 							animationDuration: this.settings.overlayShowSpeed + 'ms',
-							// animationFillMode: 'both',
+							animationFillMode: 'both',
 							animationName: 'kTip-fadeIn'
 						});
 				} else {
@@ -535,6 +535,16 @@
 
 			// Fade container in
 			var onContainerFadeIn = function() {
+				// Fixes issue in Firefox where maintaining the
+				// animation would hide the content
+				if (self.settings.cssAnimations && browserSupportsCSSAnimations) {
+					self.$container.css({
+						animationDuration: '',
+						animationFillMode: '',
+						animationName: ''
+					});
+				}
+
 				self.setFocus();
 				self.settings.onShow.call(self);
 			};
@@ -551,7 +561,7 @@
 					.show()
 					.css({
 						animationDuration: this.settings.showSpeed + 'ms',
-						// animationFillMode: 'both',
+						animationFillMode: 'both',
 						animationName: this.settings.showAnimation
 					});
 			} else {
