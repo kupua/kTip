@@ -1,0 +1,190 @@
+/*
+ * normalize.css forces the HTML tag to have a scrollbar. In onjunction with
+ * kTip's modal scrolling, it makes the page jump at the top everytime
+ * a modal window is opened. With this fix we leave the HTML tag alone and set
+ * the exact same property but in the BODY tag (which works as expected).
+ */
+
+html { overflow-y: visible !important; }
+body { overflow-y: scroll; }
+
+.kTip-container {
+	-webkit-backface-visibility: hidden; /* WebKit fix for CSS animations */
+}
+
+/*---[ Styles ]---------------------------------------------------------------*/
+
+/* Style: default modal */
+.kT-modal .kTip-content {
+	background-color: #fff;
+	border: 1px solid #999;
+	-webkit-border-radius: 2px;
+	   -moz-border-radius: 2px;
+	        border-radius: 2px;
+	-webkit-box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+	   -moz-box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+	        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+	overflow: auto;
+	position: relative;
+}
+
+/* Style: default tooltip */
+.kT-tooltip .kTip-content {
+	background-color: #fff;
+	border: 1px solid #999;
+	-webkit-border-radius: 2px;
+	   -moz-border-radius: 2px;
+	        border-radius: 2px;
+	-webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+	   -moz-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+	        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.kT-tooltip .kTip-arrow-shadow {
+	border-color: #888;
+}
+
+/* Style: tipsy */
+.kT-tipsy .kTip-content {
+	background-color: #333;
+	border: 0; /* `none` returns `medium` as width in IE, but we expect a number */
+	-webkit-border-radius: 4px;
+	   -moz-border-radius: 4px;
+	        border-radius: 4px;
+	-webkit-box-shadow: none;
+	   -moz-box-shadow: none;
+	        box-shadow: none;
+	color: #fff;
+	font-size: 11px;
+	padding: 8px 10px;
+}
+
+/*---[ Animations (daneden.me/animate) ]------------------------------------- */
+
+@-webkit-keyframes kTip-fadeIn {
+	  0% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@-moz-keyframes kTip-fadeIn {
+	  0% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@-o-keyframes kTip-fadeIn {
+	  0% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@keyframes kTip-fadeIn {
+	  0% { opacity: 0; }
+	100% { opacity: 1; }
+}
+
+@-webkit-keyframes kTip-fadeInDown {
+	0% {
+		opacity: 0;
+		-webkit-transform: translateY(-20px);
+	}
+	100% {
+		opacity: 1;
+		-webkit-transform: translateY(0);
+	}
+}
+
+@-moz-keyframes kTip-fadeInDown {
+	0% {
+		opacity: 0;
+		-moz-transform: translateY(-20px);
+	}
+	100% {
+		opacity: 1;
+		-moz-transform: translateY(0);
+	}
+}
+
+@-o-keyframes kTip-fadeInDown {
+	0% {
+		opacity: 0;
+		-o-transform: translateY(-20px);
+	}
+	100% {
+		opacity: 1;
+		-o-transform: translateY(0);
+	}
+}
+
+@keyframes kTip-fadeInDown {
+	0% {
+		opacity: 0;
+		transform: translateY(-20px);
+	}
+	100% {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@-webkit-keyframes kTip-fadeOut {
+	  0% { opacity: 1; }
+	100% { opacity: 0; }
+}
+
+@-moz-keyframes kTip-fadeOut {
+	  0% { opacity: 1; }
+	100% { opacity: 0; }
+}
+
+@-o-keyframes kTip-fadeOut {
+	  0% { opacity: 1; }
+	100% { opacity: 0; }
+}
+
+@keyframes kTip-fadeOut {
+	  0% { opacity: 1; }
+	100% { opacity: 0; }
+}
+
+@-webkit-keyframes kTip-fadeOutDown {
+	0% {
+		opacity: 1;
+		-webkit-transform: translateY(0);
+	}
+	100% {
+		opacity: 0;
+		-webkit-transform: translateY(20px);
+	}
+}
+
+@-moz-keyframes kTip-fadeOutDown {
+	0% {
+		opacity: 1;
+		-moz-transform: translateY(0);
+	}
+	100% {
+		opacity: 0;
+		-moz-transform: translateY(20px);
+	}
+}
+
+@-o-keyframes kTip-fadeOutDown {
+	0% {
+		opacity: 1;
+		-o-transform: translateY(0);
+	}
+	100% {
+		opacity: 0;
+		-o-transform: translateY(20px);
+	}
+}
+
+@keyframes kTip-fadeOutDown {
+	0% {
+		opacity: 1;
+		transform: translateY(0);
+	}
+	100% {
+		opacity: 0;
+		transform: translateY(20px);
+	}
+}
