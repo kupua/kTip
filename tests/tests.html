@@ -182,12 +182,23 @@
 	// CSS animation
 	test('.css-animation', [
 		'<p>Custom show/hide CSS animation. <a href="#" class="kTip-close">Close</a></p>'
+		+ '<p class="info">A random animation is run every 2 seconds. Can be used to alert the user of an error.</p>'
 		+ '<p class="faded">Degrades to fadeIn/fadeOut when not available (IE < 10).</p>',
 		{
 			showAnimation: 'swing',
 			showSpeed: 1000,
 			hideAnimation: 'hinge',
-			hideSpeed: 2000
+			hideSpeed: 2000,
+			onContentReady: function() {
+				var self = this;
+
+				this.testInterval = setInterval(function(){
+					self.animateContainer('shake tada swing wobble wiggle pulse'.split(' ')[Math.floor(Math.random() * 6)], 1500);
+				}, 2000);
+			},
+			onBeforeClose: function() {
+				clearInterval(this.testInterval);
+			}
 		}
 	]);
 

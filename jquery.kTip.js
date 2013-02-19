@@ -1,5 +1,5 @@
 /**
- * kTip 0.0.15
+ * kTip 0.0.16
  * Based on mgExternal 1.0.30
  *
  * Copyright 2012 Ricard Osorio Mañanas
@@ -394,14 +394,12 @@
 			};
 
 			if (this.settings.cssAnimations && browserSupportsCSSAnimations) {
-				this.$container
-					.off(animationEnd)
-					.on(animationEnd, onContainerFadeOut)
-					.css({
-						animationDuration: this.settings.hideSpeed + 'ms',
-						animationFillMode: 'both',
-						animationName: this.settings.hideAnimation
-					});
+				this._applyCssAnimation(
+					this.$container,
+					this.settings.hideAnimation,
+					this.settings.hideSpeed,
+					onContainerFadeOut
+				);
 			} else {
 				this.$container.fadeOut(300, onContainerFadeOut);
 			}
@@ -421,14 +419,12 @@
 				};
 
 				if (this.settings.cssAnimations && browserSupportsCSSAnimations) {
-					this.$overlay
-						.off(animationEnd)
-						.on(animationEnd, onOverlayFadeOut)
-						.css({
-							animationDuration: this.settings.overlayHideSpeed + 'ms',
-							animationFillMode: 'both',
-							animationName: 'kTip-fadeOut'
-						});
+					this._applyCssAnimation(
+						this.$overlay,
+						'kTip-fadeOut',
+						this.settings.overlayHideSpeed,
+						onOverlayFadeOut
+					);
 				} else {
 					this.$overlay.fadeOut(this.settings.overlayHideSpeed, onOverlayFadeOut);
 				}
@@ -520,14 +516,7 @@
 				}
 
 				if (this.settings.cssAnimations && browserSupportsCSSAnimations) {
-					this.$overlay
-						.off(animationEnd)
-						.show()
-						.css({
-							animationDuration: this.settings.overlayShowSpeed + 'ms',
-							animationFillMode: 'both',
-							animationName: 'kTip-fadeIn'
-						});
+					this._applyCssAnimation(this.$overlay.show(), 'kTip-fadeIn', this.settings.overlayShowSpeed);
 				} else {
 					this.$overlay.fadeIn(this.settings.overlayShowSpeed);
 				}
@@ -555,15 +544,12 @@
 			self.$container.hide().css('visibility', '');
 
 			if (this.settings.cssAnimations && browserSupportsCSSAnimations) {
-				this.$container
-					.off(animationEnd)
-					.on(animationEnd, onContainerFadeIn)
-					.show()
-					.css({
-						animationDuration: this.settings.showSpeed + 'ms',
-						animationFillMode: 'both',
-						animationName: this.settings.showAnimation
-					});
+				this._applyCssAnimation(
+					this.$container.show(),
+					this.settings.showAnimation,
+					this.settings.showSpeed,
+					onContainerFadeIn
+				);
 			} else {
 				this.$container.fadeIn(300, onContainerFadeIn);
 			}
@@ -899,6 +885,35 @@
 						}
 					));
 			}
+		},
+
+		animateContainer: function(animationName, animationSpeed, callback) {
+			if (this.settings.cssAnimations && browserSupportsCSSAnimations) {
+				this._applyCssAnimation(this.$container, animationName, animationSpeed, callback);
+			}
+		},
+
+		_applyCssAnimation: function($elem, animationName, animationSpeed, callback) {
+			var self = this;
+
+			$elem
+				.off(animationEnd)
+				.on(animationEnd, function(){
+					$elem.css({
+						animationDuration: '',
+						animationFillMode: '',
+						animationName: ''
+					});
+
+					if (callback) {
+						callback.call(self);
+					}
+				})
+				.css({
+					animationDuration: animationSpeed + 'ms',
+					animationFillMode: 'both',
+					animationName: animationName
+				});
 		},
 
 		moveContainer: function(modalAnimation, force) {
