@@ -1,5 +1,5 @@
 /**
- * kTip 0.0.16
+ * kTip 0.0.17
  * Based on mgExternal 1.0.30
  *
  * Copyright 2012 Ricard Osorio Mañanas
@@ -43,6 +43,9 @@
 
 	// Each browser listens to its own event
 	var animationEnd = 'animationend webkitAnimationEnd oanimationend MSAnimationEnd';
+
+	// Note: needs testing (http://stackoverflow.com/a/4819886)
+	var isTouchDevice = 'ontouchstart' in window || 'onmsgesturechange' in window;
 
 	//---[ jQuery plugin ]----------------------------------------------------//
 
@@ -299,10 +302,12 @@
 		},
 
 		modalContainerSwitch: function(enable) {
-			$('body').css({
-				marginRight: enable ? browserScrollbarWidth : '',
-				overflow: enable ? 'hidden' : ''
-			});
+			if (!isTouchDevice) {
+				$('body').css({
+					marginRight: enable ? browserScrollbarWidth : '',
+					overflow: enable ? 'hidden' : ''
+				});
+			}
 
 			if (enable) {
 				this.$container.parent().show();
@@ -556,7 +561,7 @@
 		},
 
 		destroy: function() {
-			if (this.settings.display == 'modal' && this.settings.overlay) {
+			if (this.settings.display == 'modal') {
 				this.$container.parent().remove();
 			} else {
 				this.$container.remove()
@@ -755,10 +760,12 @@
 						zIndex: this.settings.zIndexContainer
 					})
 					.hide()
-					.appendTo(this.settings.display == 'modal' && this.settings.overlay
+					.appendTo(this.settings.display == 'modal'
 						? $('<div/>')
 							.data('kTip', this) // Help detect children
-							.css({
+							.css(isTouchDevice ? {
+								zIndex: this.settings.zIndexContainer
+							} : {
 								height: '100%',
 								left: 0,
 								overflowY: 'scroll',
@@ -997,7 +1004,7 @@
 			    containerWidth = this.$container.outerWidth(true),
 			    wrapperHeight = $(window).height(),
 			    wrapperWidth = $(window).width(),
-			    scrollTop = this.settings.overlay ? 0 : $(document).scrollTop();
+			    scrollTop = isTouchDevice ? $(document).scrollTop() : 0;
 
 			if (this.settings.overlay) {
 				containerWidth += browserScrollbarWidth;
