@@ -1,5 +1,5 @@
 /**
- * kTip 0.1.1
+ * kTip 0.2.0
  * Based on mgExternal 1.0.30
  *
  * Copyright 2012 Ricard Osorio Mañanas
@@ -137,9 +137,7 @@
 				'[autofocus]:visible:enabled:first',
 				':input:not(:radio):visible:enabled:first'
 			],
-			zIndexContainer: 999,
-			zIndexTooltipTrigger: 998,
-			zIndexOverlay: 997,
+			zIndex: 999,
 			breatheSeparation: (options && options.display == 'modal') ? 30 : 0,
 
 			// Ajax built-in functionality
@@ -513,7 +511,7 @@
 				};
 				this.$trigger.css({
 					position: this._triggerZIndexBackup.position ? null : 'relative',
-					zIndex: this.settings.zIndexTooltipTrigger
+					zIndex: this.settings.zIndex
 				});
 			}
 
@@ -536,9 +534,16 @@
 			};
 
 			// Set correct position before showing
-			self.$container.css('visibility', 'hidden').show();
-			self.moveContainer('instant');
-			self.$container.hide().css('visibility', '');
+			this.$container.css('visibility', 'hidden').show();
+			this.moveContainer('instant');
+			this.$container.hide().css('visibility', '');
+
+			// Show over all other kTip windows
+			if (this.settings.display == 'modal') {
+				this.$container.parent().appendTo('body');
+			} else {
+				this.$container.appendTo('body');
+			}
 
 			if (this.settings.cssAnimations && browserSupportsCSSAnimations) {
 				this._applyCssAnimation(
@@ -748,7 +753,7 @@
 					.addClass(this.settings.extraClass)
 					.css({
 						position: 'absolute',
-						zIndex: this.settings.zIndexContainer
+						zIndex: this.settings.zIndex
 					})
 					.hide()
 					.appendTo(this.settings.display == 'modal'
@@ -756,7 +761,7 @@
 							.data('kTip', this) // Help detect children
 							.addClass('kTip-container-parent')
 							.css(isTouchDevice ? {
-								zIndex: this.settings.zIndexContainer
+								zIndex: this.settings.zIndex
 							} : {
 								height: '100%',
 								left: 0,
@@ -764,7 +769,7 @@
 								position: 'fixed',
 								top: 0,
 								width: '100%',
-								zIndex: this.settings.zIndexContainer
+								zIndex: this.settings.zIndex
 							})
 							.hide()
 							.appendTo('body')
@@ -854,10 +859,11 @@
 						position: 'fixed',
 						top: 0,
 						width: '100%', // 100% doesn't work properly on touchscreens
-						zIndex: this.settings.zIndexOverlay
+						zIndex: this.settings.zIndex
 					})
 					.hide()
-					.appendTo('body');
+					.prependTo('body'); // Insert before any other content, including tooltip triggers
+					                    // (that would otherwise be hidden by the overlay)
 			}
 
 			if (!this.$tooltipArrow && this.settings.display == 'tooltip' && this.settings.tooltip.arrowSize) {
