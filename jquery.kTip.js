@@ -1,5 +1,5 @@
 /**
- * kTip 0.0.18
+ * kTip 0.1.0
  * Based on mgExternal 1.0.30
  *
  * Copyright 2012 Ricard Osorio Mañanas
@@ -44,8 +44,9 @@
 	// Each browser listens to its own event
 	var animationEnd = 'animationend webkitAnimationEnd oanimationend MSAnimationEnd';
 
-	// Note: needs testing (http://stackoverflow.com/a/4819886)
-	var isTouchDevice = 'ontouchstart' in window || 'onmsgesturechange' in window;
+	// Will change in the future, as browsers evolve and touch screen detection
+	// improves
+	var isTouchDevice = 'ontouchstart' in document.documentElement;
 
 	//---[ jQuery plugin ]----------------------------------------------------//
 
@@ -150,9 +151,7 @@
 
 			// Modal settings
 			modal: {
-				animateSpeed: 500,
-				onDisableScroll: function(){},
-				onRestoreScroll: function(){}
+				animateSpeed: 500
 			},
 
 			// Tooltip settings
@@ -302,7 +301,17 @@
 		},
 
 		modalContainerSwitch: function(enable) {
-			if (!isTouchDevice) {
+
+			var modalParentOpen = false;
+
+			if (this.$trigger) {
+				var parentInstance = this.$trigger.parents(':kTip').data('kTip');
+				if (parentInstance && parentInstance.settings.display == 'modal' && parentInstance.isVisible()) {
+					modalParentOpen = true;
+				}
+			}
+
+			if (!isTouchDevice && !modalParentOpen) {
 				$('body').css({
 					marginRight: enable ? browserScrollbarWidth : '',
 					overflow: enable ? 'hidden' : ''
@@ -311,10 +320,8 @@
 
 			if (enable) {
 				this.$container.parent().show();
-				this.settings.modal.onDisableScroll.call(this);
 			} else {
 				this.$container.parent().hide();
-				this.settings.modal.onRestoreScroll.call(this);
 			}
 		},
 
@@ -356,7 +363,7 @@
 			}
 			// Show existing content
 			else if (!this.isVisible()) {
-				this.showContainer();
+				this._showContainer();
 			}
 		},
 
@@ -444,19 +451,23 @@
 		setContent: function(html, modalAnimation) {
 
 			if (!this.$container) {
-				this.createElements();
+				this._createElements();
 			}
+
+			var modalAnimationObj;
 
 			if (this.settings.display == 'modal') {
-				modalAnimation = modalAnimation || {type: 'resize'};
-				modalAnimation.$preContent = this.$content.clone(false);
-				modalAnimation.preHeight = this.$content.height();
-				modalAnimation.preWidth = this.$content.width();
+				modalAnimationObj = {
+					type: modalAnimation,
+					$preContent: this.$content.clone(false),
+					preHeight: this.$content.height(),
+					preWidth: this.$content.width()
+				};
 			}
 
-			var $dummyContent = this.$content.clone();
-
-			$dummyContent.appendTo(this.$container);
+			var $dummyContent = this.$content
+				.clone()
+				.appendTo(this.$container);
 
 			this.$content
 				.html(html)
@@ -468,7 +479,7 @@
 				})
 				.appendTo('body');
 
-			this.bindSpecialActions();
+			this._bindSpecialActions();
 			this.settings.onContentReady.call(this);
 
 			this.$content.css({
@@ -487,14 +498,14 @@
 			if (this._show) {
 				if (this.isVisible() && this.$container.css('opacity') == 1) {
 					this.setFocus();
-					return this.moveContainer(modalAnimation, true);
+					return this.moveContainer(modalAnimationObj, true);
 				} else {
-					this.showContainer();
+					this._showContainer();
 				}
 			}
 		},
 
-		showContainer: function() {
+		_showContainer: function() {
 
 			if (this.settings.onBeforeShow.call(this) === false) {
 				return;
@@ -515,11 +526,11 @@
 				});
 			}
 
-			if (this.settings.overlay) {
-				if (this.settings.display == 'modal') {
-					this.modalContainerSwitch(true);
-				}
+			if (this.settings.display == 'modal') {
+				this.modalContainerSwitch(true);
+			}
 
+			if (this.settings.overlay) {
 				if (this.settings.cssAnimations && browserSupportsCSSAnimations) {
 					this._applyCssAnimation(this.$overlay.show(), 'kTip-fadeIn', this.settings.overlayShowSpeed);
 				} else {
@@ -535,7 +546,7 @@
 
 			// Set correct position before showing
 			self.$container.css('visibility', 'hidden').show();
-			self.moveContainer({type: 'instant'});
+			self.moveContainer('instant');
 			self.$container.hide().css('visibility', '');
 
 			if (this.settings.cssAnimations && browserSupportsCSSAnimations) {
@@ -560,7 +571,7 @@
 			this.$trigger.removeData('kTip');
 		},
 
-		bindSpecialActions: function() {
+		_bindSpecialActions: function() {
 
 			var self = this;
 
@@ -610,23 +621,20 @@
 			// });
 
 			this.$content.find('[class*="kTip-redirect"]').on('click', function(e){
-				var $elem = $(this);
-
 				e.preventDefault();
 
-				// $elem.addClass(self.settings.loadingClass); // Why repeat? Already used in loadAjaxContent
-
-				var modalAnimation = {};
+				var $elem = $(this),
+				    modalAnimation;
 
 				if (self.settings.display == 'modal') {
 					if ($elem.is('[class*="redirect-fade"]')) {
-						modalAnimation.type = 'fade';
+						modalAnimation = 'fade';
 					} else if ($elem.is('[class*="redirect-move"]')) {
-						modalAnimation.type = 'move';
+						modalAnimation = 'move';
 					} else if ($elem.is('[class*="redirect-instant"]')) {
-						modalAnimation.type = 'instant';
+						modalAnimation = 'instant';
 					} else {
-						modalAnimation.type = 'resize';
+						modalAnimation = 'resize';
 					}
 				}
 
@@ -717,7 +725,9 @@
 				return;
 			}
 
-			var form = this.$content.find(this.settings.submitIdentifier+'[value="'+this._lastSubmitName+'"]').parents('form:visible');
+			var form = this.$content
+				.find(this.settings.submitIdentifier+'[value="'+this._lastSubmitName+'"]')
+				.parents('form:visible');
 
 			if (form.length == 0) {
 				form = this.$content.find('form:first:visible');
@@ -736,7 +746,7 @@
 			}, 10);
 		},
 
-		createElements: function() {
+		_createElements: function() {
 
 			var self = this;
 
@@ -921,14 +931,18 @@
 
 			this.$content.stop();
 
-			//---[ Fix narrow blocks past body width ]------------------------//
+			var modalAnimationObj = $.isPlainObject(modalAnimation)
+				? modalAnimation
+				: {
+					type: modalAnimation || 'resize'
+				};
 
-			modalAnimation = modalAnimation || {type: 'resize'};
-
-			if (!modalAnimation.preHeight || !modalAnimation.preWidth) {
-				modalAnimation.preHeight = this.$content.height();
-				modalAnimation.preWidth = this.$content.width();
+			if (!modalAnimationObj.preHeight || !modalAnimationObj.preWidth) {
+				modalAnimationObj.preHeight = this.$content.height();
+				modalAnimationObj.preWidth = this.$content.width();
 			}
+
+			//---[ Fix narrow blocks past body width ]------------------------//
 
 			if (!this.settings.css.height || !this.settings.css.width) {
 				if (force || !this._moveTimeout) {
@@ -966,22 +980,22 @@
 				}
 			}
 
-			modalAnimation.postHeight = this.$content.height();
-			modalAnimation.postWidth = this.$content.width();
+			modalAnimationObj.postHeight = this.$content.height();
+			modalAnimationObj.postWidth = this.$content.width();
 
 			//---[ Call depending on display ]--------------------------------//
 
 			switch (this.settings.display) {
 				case 'modal':
-					this.moveModal(modalAnimation);
+					this._moveModal(modalAnimationObj);
 					break;
 				case 'tooltip':
-					this.moveTooltip();
+					this._moveTooltip();
 					break;
 			}
 		},
 
-		moveModal: function(modalAnimation) {
+		_moveModal: function(modalAnimationObj) {
 
 			var self = this,
 			    top = 0,
@@ -991,14 +1005,10 @@
 			this.$container.css('padding', breatheSeparation+'px 0 '+(breatheSeparation*2)+'px');
 
 			var containerHeight = this.$container.outerHeight(true),
-			    containerWidth = this.$container.outerWidth(true),
+			    containerWidth = this.$container.outerWidth(true) + browserScrollbarWidth,
 			    wrapperHeight = $(window).height(),
 			    wrapperWidth = $(window).width(),
 			    scrollTop = isTouchDevice ? $(document).scrollTop() : 0;
-
-			if (this.settings.overlay) {
-				containerWidth += browserScrollbarWidth;
-			}
 
 			if (containerHeight < wrapperHeight) {
 				top = scrollTop + ((wrapperHeight - containerHeight) / 2);
@@ -1013,14 +1023,14 @@
 				left = 0;
 			}
 
-			switch (modalAnimation.type) {
+			switch (modalAnimationObj.type) {
 
 				case 'fade':
 					this.$content.hide();
 					this.$container
-						.append(modalAnimation.$preContent)
+						.append(modalAnimationObj.$preContent)
 						.fadeOut(this.settings.modal.animateSpeed, function(){
-							modalAnimation.$preContent.remove();
+							modalAnimationObj.$preContent.remove();
 							self.$content.show();
 							self.$container.css({
 								top: top,
@@ -1050,11 +1060,11 @@
 				case 'resize':
 				default:
 					this.$content.css({
-						height: modalAnimation.preHeight,
-						width: modalAnimation.preWidth
+						height: modalAnimationObj.preHeight,
+						width: modalAnimationObj.preWidth
 					}).animate({
-						height: modalAnimation.postHeight,
-						width: modalAnimation.postWidth
+						height: modalAnimationObj.postHeight,
+						width: modalAnimationObj.postWidth
 					}, this.settings.modal.animateSpeed, function(){
 						self.$content.css('height', self.settings.css.height || '');
 					});
@@ -1067,7 +1077,7 @@
 			}
 		},
 
-		moveTooltip: function() {
+		_moveTooltip: function() {
 
 			//---[ Useful vars ]----------------------------------------------//
 
@@ -1236,7 +1246,7 @@
 
 			if (arrowSize) {
 				if (!this.$tooltipArrow) {
-					this.createElements();
+					this._createElements();
 				}
 
 				this.$tooltipArrow.show();
