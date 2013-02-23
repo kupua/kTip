@@ -1,5 +1,5 @@
 /**
- * kTip 0.0.17
+ * kTip 0.0.18
  * Based on mgExternal 1.0.30
  *
  * Copyright 2012 Ricard Osorio Mañanas
@@ -529,16 +529,6 @@
 
 			// Fade container in
 			var onContainerFadeIn = function() {
-				// Fixes issue in Firefox where maintaining the
-				// animation would hide the content
-				if (self.settings.cssAnimations && browserSupportsCSSAnimations) {
-					self.$container.css({
-						animationDuration: '',
-						animationFillMode: '',
-						animationName: ''
-					});
-				}
-
 				self.setFocus();
 				self.settings.onShow.call(self);
 			};
