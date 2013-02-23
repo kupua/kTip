@@ -1,5 +1,5 @@
 /**
- * kTip 0.1.0
+ * kTip 0.1.1
  * Based on mgExternal 1.0.30
  *
  * Copyright 2012 Ricard Osorio Mañanas
@@ -302,16 +302,7 @@
 
 		modalContainerSwitch: function(enable) {
 
-			var modalParentOpen = false;
-
-			if (this.$trigger) {
-				var parentInstance = this.$trigger.parents(':kTip').data('kTip');
-				if (parentInstance && parentInstance.settings.display == 'modal' && parentInstance.isVisible()) {
-					modalParentOpen = true;
-				}
-			}
-
-			if (!isTouchDevice && !modalParentOpen) {
+			if (!isTouchDevice && !$('.kTip-container-parent:visible').not(this.$container.parent()).length) {
 				$('body').css({
 					marginRight: enable ? browserScrollbarWidth : '',
 					overflow: enable ? 'hidden' : ''
@@ -763,6 +754,7 @@
 					.appendTo(this.settings.display == 'modal'
 						? $('<div/>')
 							.data('kTip', this) // Help detect children
+							.addClass('kTip-container-parent')
 							.css(isTouchDevice ? {
 								zIndex: this.settings.zIndexContainer
 							} : {
