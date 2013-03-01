@@ -1,5 +1,5 @@
 /**
- * kTip 0.2.0
+ * kTip 0.2.1
  * Based on mgExternal 1.0.30
  *
  * Copyright 2012 Ricard Osorio Mañanas
@@ -520,6 +520,9 @@
 			}
 
 			if (this.settings.overlay) {
+				// Show over all other overlays
+				this.$overlay.insertAfter('.kTip-overlay:last');
+
 				if (this.settings.cssAnimations && browserSupportsCSSAnimations) {
 					this._applyCssAnimation(this.$overlay.show(), 'kTip-fadeIn', this.settings.overlayShowSpeed);
 				} else {
@@ -562,6 +565,9 @@
 				this.$container.parent().remove();
 			} else {
 				this.$container.remove()
+			}
+			if (this.$overlay) {
+				this.$overlay.remove();
 			}
 			this.settings.onDestroy.call(this);
 			this.$trigger.removeData('kTip');
