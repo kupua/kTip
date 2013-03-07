@@ -1,5 +1,5 @@
 /**
- * kTip 0.2.1
+ * kTip 0.2.2
  * Based on mgExternal 1.0.30
  *
  * Copyright 2012 Ricard Osorio Mañanas
@@ -302,7 +302,8 @@
 
 			if (!isTouchDevice && !$('.kTip-container-parent:visible').not(this.$container.parent()).length) {
 				$('body').css({
-					marginRight: enable ? browserScrollbarWidth : '',
+					// Only add margin if the body has a scrollbar
+					marginRight: (enable && $(document).height() > $(window).height()) ? browserScrollbarWidth : '',
 					overflow: enable ? 'hidden' : ''
 				});
 			}
