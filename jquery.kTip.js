@@ -1,5 +1,5 @@
 /**
- * kTip 0.2.2
+ * kTip 0.2.3
  * Based on mgExternal 1.0.30
  *
  * Copyright 2012 Ricard Osorio Mañanas
@@ -1086,7 +1086,11 @@
 
 			//---[ Useful vars ]----------------------------------------------//
 
-			var pos = {top: 0, left: 0},
+			var pos = {
+					top: 0,
+					left: 0,
+					position: undefined
+				},
 			    breatheSeparation = this.settings.breatheSeparation
 			                      + this.settings.tooltip.arrowSize,
 			    windowHeight = $(window).height(),
@@ -1328,7 +1332,7 @@
 			this.$container.css({
 				top: Math.round(pos.top),
 				left: Math.round(pos.left),
-				position: position
+				position: pos.position
 			});
 		}
 	};
