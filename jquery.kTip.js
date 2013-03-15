@@ -815,7 +815,12 @@
 					// So here we are, tracking where the clicking starts...
 
 					$('body').on('mousedown', function(e){
-						if (self.areAllChildrenClosed() && !self.$container.is(e.target) && !self.$container.find(e.target).length) {
+						if (
+							   !$(e.target).parents('.kTip-ignore-click').addBack().hasClass('kTip-ignore-click')
+							&&  self.areAllChildrenClosed()
+							&& !self.$container.is(e.target)
+							&& !self.$container.find(e.target).length
+						) {
 							self._lastMousedownOutside = true;
 						} else {
 							self._lastMousedownOutside = false;
