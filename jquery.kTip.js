@@ -133,6 +133,7 @@
 			overlayShowSpeed: 300,
 			overlayHideSpeed: 300,
 			submitIdentifier: 'input[type="submit"]',
+			ignoreClickSelector: '.kTip-ignore-click',
 			focusPriority: [
 				'[autofocus]:visible:enabled:first',
 				':input:not(:radio):visible:enabled:first'
@@ -816,7 +817,10 @@
 
 					$('body').on('mousedown', function(e){
 						if (
-							   !$(e.target).parents('.kTip-ignore-click').addBack().hasClass('kTip-ignore-click')
+							!$(e.target)
+								.parents(self.settings.ignoreClickSelector)
+								.addBack()
+									.is(self.settings.ignoreClickSelector)
 							&&  self.areAllChildrenClosed()
 							&& !self.$container.is(e.target)
 							&& !self.$container.find(e.target).length
