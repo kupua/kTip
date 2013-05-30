@@ -1,5 +1,5 @@
 /**
- * kTip 0.2.3
+ * kTip 0.2.4
  * Based on mgExternal 1.0.30
  *
  * Copyright 2012 Ricard Osorio Mañanas
@@ -797,8 +797,13 @@
 					this.$container.on('mouseleave', function(){self.close(self.settings.hideDelay)});
 				}
 
-				// Resize re-position
-				$(window).on('resize', function(){self.moveContainer()});
+				// Resize re-position except for touch modals. Touch devices
+				// shouldn't update on resize, as the way they work differs from
+				// the desktop version, and scrolling can lead to the modal
+				// constantly moving.
+				if (this.settings.display == 'tooltip' || !isTouchDevice) {
+					$(window).on('resize', function(){self.moveContainer()});
+				}
 
 				if (this.settings.display == 'tooltip') {
 					$(window).on('scroll', function(){self.moveContainer()});
@@ -807,8 +812,8 @@
 				// Hide on outside click
 				if (this.settings.outsideClose) {
 
-					// `mousedown` event fires everytime, even when the clicking
-					// a scrollbar. We don't want to close on scrollbar click,
+					// `mousedown` event fires everytime, even when clicking
+					// a scrollbar. We don't want to close on a scrollbar click,
 					// so we should use `mouseup` (`click` gives problems
 					// sometimes). Problem is, when some selects a text, the
 					// mousedown starts inside the container, but sometimes ends
