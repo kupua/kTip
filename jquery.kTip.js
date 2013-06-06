@@ -1,5 +1,5 @@
 /**
- * kTip 0.2.4
+ * kTip 0.2.5
  * Based on mgExternal 1.0.30
  *
  * Copyright 2012 Ricard Osorio Mañanas
@@ -27,7 +27,7 @@
 	var browserVendorPrefixes = ' Webkit Moz O ms Khtml'.split(' ');
 
 	// Real value is calculated on document ready
-	var browserScrollbarWidth;
+	var browserScrollbarWidth = 0;
 
 	// Based on https://hacks.mozilla.org/2011/09/detecting-and-generating-css-animations-in-javascript/
 	var browserSupportsCSSAnimations = function(){
@@ -829,6 +829,7 @@
 							&&  self.areAllChildrenClosed()
 							&& !self.$container.is(e.target)
 							&& !self.$container.find(e.target).length
+							&& (innerWidth - e.pageX) > browserScrollbarWidth // Detect clicks on scrollbars inside DIVs
 						) {
 							self._lastMousedownOutside = true;
 						} else {
