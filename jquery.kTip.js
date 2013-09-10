@@ -820,7 +820,7 @@
 					// outside. We also don't want to close in that circumstance.
 					// So here we are, tracking where the clicking starts...
 
-					$('body').on('mousedown', function(e){
+					$('html').on('mousedown', function(e){
 						if (
 							!$(e.target)
 								.parents(self.settings.ignoreClickSelector)
@@ -838,9 +838,10 @@
 					});
 
 					// ...and here closing when it started outside. Tada!
-					// Also: using body instead of document as clicking on the
-					// sidebar would trigger the event.
-					$('body').on('mouseup', function(e){
+					// Also: using html instead of document as clicking on the
+					// sidebar would trigger the event, and body does not always
+					// cover the whole page (html does)
+					$('html').on('mouseup', function(e){
 						if (self._lastMousedownOutside) {
 							if (self._preventNextMousedown) {
 								self._preventNextMousedown = false;
