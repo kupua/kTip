@@ -1,5 +1,5 @@
 /**
- * kTip 0.2.5
+ * kTip 0.2.6
  * Based on mgExternal 1.0.30
  *
  * Copyright 2012 Ricard Osorio Mañanas
@@ -375,8 +375,9 @@
 
 			// this.abortCurrentAjaxRequest();
 			this.$trigger
-				.removeClass(this.settings.loadingClass)
-				.removeClass(this.settings.activeClass);
+				.add(this.settings.tooltip.positionSource)
+					.removeClass(this.settings.loadingClass)
+					.removeClass(this.settings.activeClass);
 
 			this.settings.onStopLoading.call(this);
 
@@ -701,7 +702,9 @@
 
 		setLoadingState: function() {
 			if (this.$trigger) {
-				this.$trigger.addClass(this.settings.loadingClass);
+				this.$trigger
+					.add(this.settings.tooltip.positionSource)
+						.addClass(this.settings.loadingClass);
 			}
 
 			if (this.$content) {
@@ -713,7 +716,9 @@
 
 		disableLoadingState: function() {
 			if (this.$trigger) {
-				this.$trigger.removeClass(this.settings.loadingClass);
+				this.$trigger
+					.add(this.settings.tooltip.positionSource)
+						.removeClass(this.settings.loadingClass);
 			}
 
 			if (this.$content) {
