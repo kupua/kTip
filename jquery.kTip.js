@@ -702,9 +702,11 @@
 
 		setLoadingState: function() {
 			if (this.$trigger) {
-				this.$trigger
-					.add(this.settings.tooltip.positionSource)
-						.addClass(this.settings.loadingClass);
+				this.$trigger.addClass(this.settings.loadingClass);
+			}
+
+			if (this.settings.tooltip.positionSource) {
+				this.settings.tooltip.positionSource.addClass(this.settings.loadingClass);
 			}
 
 			if (this.$content) {
@@ -716,9 +718,11 @@
 
 		disableLoadingState: function() {
 			if (this.$trigger) {
-				this.$trigger
-					.add(this.settings.tooltip.positionSource)
-						.removeClass(this.settings.loadingClass);
+				this.$trigger.removeClass(this.settings.loadingClass);
+			}
+
+			if (this.settings.tooltip.positionSource) {
+				this.settings.tooltip.positionSource.removeClass(this.settings.loadingClass);
 			}
 
 			if (this.$content) {
