@@ -230,7 +230,7 @@
 			switch (this.settings.display) {
 
 				case 'modal':
-					this.$trigger.on('click', function(e){
+					this.$trigger.on('click.kTip', function(e){
 						self.open(self.settings.showDelay);
 						e.preventDefault();
 						//e.stopPropagation();
@@ -240,7 +240,7 @@
 				case 'tooltip':
 					switch (this.settings.tooltip.bind) {
 						case 'click':
-							this.$trigger.on('click', function(e){
+							this.$trigger.on('click.kTip', function(e){
 								self.isVisible() ? self.close() : self.open(self.settings.showDelay);
 								e.preventDefault();
 								//e.stopPropagation();
@@ -248,18 +248,18 @@
 							break;
 						case 'hover':
 							this.$trigger.on({
-								mouseenter: function(){self.open(self.settings.showDelay)},
-								mouseleave: function(){self.close(self.settings.hideDelay)},
-								mousedown: function(e){e.stopPropagation()},
-								mouseup: function(e){e.stopPropagation()}
+								"mouseenter.kTip": function(){self.open(self.settings.showDelay)},
+								"mouseleave.kTip": function(){self.close(self.settings.hideDelay)},
+								"mousedown.kTip": function(e){e.stopPropagation()},
+								"mouseup.kTip": function(e){e.stopPropagation()}
 							});
 							break;
 						case 'focus':
 							this.$trigger.on({
-								focus: function(){self.open(self.settings.showDelay)},
-								blur: function(){self.close(self.settings.hideDelay)},
-								mousedown: function(e){e.stopPropagation()},
-								mouseup: function(e){e.stopPropagation()}
+								"focus.kTip": function(){self.open(self.settings.showDelay)},
+								"blur.kTip": function(){self.close(self.settings.hideDelay)},
+								"mousedown.kTip": function(e){e.stopPropagation()},
+								"mouseup.kTip": function(e){e.stopPropagation()}
 							});
 							break;
 					}
@@ -582,7 +582,7 @@
 
 			// File uploads don't work on IE. MUST FIX
 			if (this.settings.ajax.handleForms && $.fn.ajaxSubmit) {
-				this.$content.find('form').on('submit', function(e){
+				this.$content.find('form').on('submit.kTip', function(e){
 					var $form = $(this);
 					e.preventDefault();
 					// if ($form.attr('enctype') == 'multipart/form-data' || $form.find('input[type="file"]').length) {
@@ -625,7 +625,7 @@
 			// 	}
 			// });
 
-			this.$content.find('[class*="kTip-redirect"]').on('click', function(e){
+			this.$content.find('[class*="kTip-redirect"]').on('click.kTip', function(e){
 				e.preventDefault();
 
 				var $elem = $(this),
@@ -646,7 +646,7 @@
 				self.redirect($elem.attr('href'), modalAnimation);
 			});
 
-			this.$content.find('.kTip-close').on('click', function(e){
+			this.$content.find('.kTip-close').on('click.kTip', function(e){
 				self.close();
 				e.preventDefault();
 			});
@@ -791,7 +791,7 @@
 							.hide()
 							.appendTo('body')
 						: 'body')
-					.on('mouseup', function(e){
+					.on('mouseup.kTip', function(e){
 						// Required if outsideClose is set to true
 						self._preventNextMouseup = true;
 					});
@@ -802,8 +802,8 @@
 					.appendTo(this.$container);
 
 				if (this.settings.tooltip.bind == 'hover') {
-					this.$container.on('mouseenter', function(){self.open(self.settings.showDelay)});
-					this.$container.on('mouseleave', function(){self.close(self.settings.hideDelay)});
+					this.$container.on('mouseenter.kTip', function(){self.open(self.settings.showDelay)});
+					this.$container.on('mouseleave.kTip', function(){self.close(self.settings.hideDelay)});
 				}
 
 				// Resize re-position except for touch modals. Touch devices
@@ -811,11 +811,11 @@
 				// the desktop version, and scrolling can lead to the modal
 				// constantly moving.
 				if (this.settings.display == 'tooltip' || !isTouchDevice) {
-					$(window).on('resize', function(){self.moveContainer()});
+					$(window).on('resize.kTip', function(){self.moveContainer()});
 				}
 
 				if (this.settings.display == 'tooltip') {
-					$(window).on('scroll', function(){self.moveContainer()});
+					$(window).on('scroll.kTip', function(){self.moveContainer()});
 				}
 
 				// Hide on outside click
@@ -829,7 +829,7 @@
 					// outside. We also don't want to close in that circumstance.
 					// So here we are, tracking where the clicking starts...
 
-					$('html').on('mousedown', function(e){
+					$('html').on('mousedown.kTip', function(e){
 						if (
 							!$(e.target)
 								.parents(self.settings.ignoreClickSelector)
@@ -850,7 +850,7 @@
 					// Also: using html instead of document as clicking on the
 					// sidebar would trigger the event, and body does not always
 					// cover the whole page (html does)
-					$('html').on('mouseup', function(e){
+					$('html').on('mouseup.kTip', function(e){
 						if (self._lastMousedownOutside) {
 							if (self._preventNextMousedown) {
 								self._preventNextMousedown = false;
@@ -863,7 +863,7 @@
 
 				// Hide on ESC press
 				if (this.settings.escClose) {
-					$(document).on('keyup', function(e){
+					$(document).on('keyup.kTip', function(e){
 						if (e.keyCode == 27 && self.isVisible() && self.areAllChildrenClosed()) {
 							self.close();
 						}
