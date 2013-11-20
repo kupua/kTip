@@ -652,6 +652,13 @@
 			});
 		},
 
+		_isIgnoredClick: function(e) {
+			return $(e.target)
+				.parents(this.settings.ignoreClickSelector)
+				.addBack()
+				.is(this.settings.ignoreClickSelector)
+		},
+
 		// abortCurrentAjaxRequest: function() {
 		// 	if (this._currentAjaxRequest) {
 		// 		this._currentAjaxRequest.abort();
@@ -831,14 +838,11 @@
 
 					$('html').on('mousedown.kTip', function(e){
 						if (
-							!$(e.target)
-								.parents(self.settings.ignoreClickSelector)
-								.addBack()
-									.is(self.settings.ignoreClickSelector)
+							!self._isIgnoredClick(e)
 							&&  self.areAllChildrenClosed()
 							&& !self.$container.is(e.target)
 							&& !self.$container.find(e.target).length
-							&& (innerWidth - e.pageX) > browserScrollbarWidth // Detect clicks on scrollbars inside DIVs
+							&& ($(document).innerWidth() - e.pageX) > browserScrollbarWidth // Detect clicks on scrollbars inside DIVs
 						) {
 							self._lastMousedownOutside = true;
 						} else {
@@ -852,9 +856,15 @@
 					// cover the whole page (html does)
 					$('html').on('mouseup.kTip', function(e){
 						if (self._lastMousedownOutside) {
-							if (self._preventNextMousedown) {
-								self._preventNextMousedown = false;
-							} else if (e.which == 1 && self.isVisible()) {
+							if (self._preventNextMouseup) {
+								self._preventNextMouseup = false;
+							}
+							// We also check if the clicked target meets
+							// setings.ignoreClickSelector criteria, as
+							// sometimes the mouseup event is prevented
+							// (select2 for example does this, and makes kTip
+							// close the window as a result)
+							else if (!self._isIgnoredClick(e) && e.which == 1 && self.isVisible()) {
 								self.close();
 							}
 						}
