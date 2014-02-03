@@ -643,6 +643,7 @@
 					}
 				}
 
+				$elem.addClass(self.settings.loadingClass);
 				self.redirect($elem.attr('href'), modalAnimation);
 			});
 
