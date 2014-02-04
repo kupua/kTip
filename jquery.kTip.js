@@ -433,9 +433,9 @@
 			this.$content
 				.html(html)
 				.css({
-					// left: 0,
-					// top: 0,
-					// position: 'absolute',
+					left: 0,
+					top: 0,
+					position: 'absolute',
 					visibility: 'hidden'
 				})
 				.appendTo('body');
@@ -444,9 +444,9 @@
 			this.settings.onContentReady.call(this);
 
 			this.$content.css({
-				// left: '',
-				// top: '',
-				// position: '',
+				left: '',
+				top: '',
+				position: '',
 				visibility: ''
 			});
 
