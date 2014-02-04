@@ -1000,18 +1000,43 @@
 
 				case 'fade':
 					this.$content.hide();
-					this.$container
-						.append(modalAnimationObj.$preContent)
-						.fadeOut(this.settings.modal.animateSpeed, function(){
-							modalAnimationObj.$preContent.remove();
-							self.$content.show();
-							self.$container.css({
-								top: top,
-								left: left
-							}).fadeIn(self.settings.modal.animateSpeed, function(){
-								self.setFocus();
+					this.$container.append(modalAnimationObj.$preContent)
+
+					if (browserSupportsCSSAnimations) {
+						this._applyCssAnimation(
+							this.$container,
+							'kTip-fadeOutDown',
+							this.settings.modal.animateSpeed,
+							function(){
+								modalAnimationObj.$preContent.remove();
+								self.$content.show();
+								self.$container.css({
+									top: top,
+									left: left
+								});
+								self._applyCssAnimation(
+									self.$container,
+									'kTip-fadeInDown',
+									self.settings.modal.animateSpeed,
+									function(){
+										self.setFocus();
+									}
+								);
+							}
+						);
+					} else {
+						this.$container
+							.fadeOut(this.settings.modal.animateSpeed, function(){
+								modalAnimationObj.$preContent.remove();
+								self.$content.show();
+								self.$container.css({
+									top: top,
+									left: left
+								}).fadeIn(self.settings.modal.animateSpeed, function(){
+									self.setFocus();
+								});
 							});
-						});
+					}
 					break;
 
 				case 'move':
