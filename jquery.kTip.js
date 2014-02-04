@@ -97,7 +97,6 @@
 
 			// Appearance
 			css: {}, // Custom CSS
-			cssAnimations: true, // Use CSS animations when possible
 			extraClass: (options && options.display) ? 'kT-'+options.display : 'kT-tooltip',
 			activeClass: 'active',
 			loadingClass: 'loading',
@@ -378,7 +377,7 @@
 				}
 			};
 
-			if (this.settings.cssAnimations && browserSupportsCSSAnimations) {
+			if (browserSupportsCSSAnimations) {
 				this._applyCssAnimation(
 					this.$container,
 					this.settings.hideAnimation,
@@ -403,7 +402,7 @@
 					self.settings.onClose.call(self);
 				};
 
-				if (this.settings.cssAnimations && browserSupportsCSSAnimations) {
+				if (browserSupportsCSSAnimations) {
 					this._applyCssAnimation(
 						this.$overlay,
 						'kTip-fadeOut',
@@ -507,7 +506,7 @@
 				// Show over all other overlays
 				this.$overlay.insertAfter('.kTip-overlay:last');
 
-				if (this.settings.cssAnimations && browserSupportsCSSAnimations) {
+				if (browserSupportsCSSAnimations) {
 					this._applyCssAnimation(this.$overlay.show(), 'kTip-fadeIn', this.settings.overlayShowSpeed);
 				} else {
 					this.$overlay.fadeIn(this.settings.overlayShowSpeed);
@@ -532,7 +531,7 @@
 				this.$container.appendTo('body');
 			}
 
-			if (this.settings.cssAnimations && browserSupportsCSSAnimations) {
+			if (browserSupportsCSSAnimations) {
 				this._applyCssAnimation(
 					this.$container.show(),
 					this.settings.showAnimation,
@@ -870,7 +869,7 @@
 					.data('kTip', this) // Help detect children
 					.attr('class', 'kTip-overlay')
 					.css({
-						background: (this.settings.cssAnimations && browserSupportsCSSAnimations)
+						background: (browserSupportsCSSAnimations)
 							? 'rgba('
 								+ this.settings.overlayColorRGB.r + ', '
 								+ this.settings.overlayColorRGB.g + ', '
@@ -879,7 +878,7 @@
 							: this.settings.overlayColor,
 						height: '100%', // 100% doesn't work properly on touchscreens
 						left: 0,
-						opacity: (this.settings.cssAnimations && browserSupportsCSSAnimations) ? null : this.settings.overlayOpacity,
+						opacity: (browserSupportsCSSAnimations) ? null : this.settings.overlayOpacity,
 						position: 'fixed',
 						top: 0,
 						width: '100%', // 100% doesn't work properly on touchscreens
@@ -917,7 +916,7 @@
 		},
 
 		animateContainer: function(animationName, animationSpeed, callback) {
-			if (this.settings.cssAnimations && browserSupportsCSSAnimations) {
+			if (browserSupportsCSSAnimations) {
 				this._applyCssAnimation(this.$container, animationName, animationSpeed, callback);
 			}
 		},
