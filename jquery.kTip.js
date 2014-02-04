@@ -1,8 +1,8 @@
 /**
- * kTip 0.2.6
+ * kTip 0.2.7
  * Based on mgExternal 1.0.30
  *
- * Copyright 2012 Ricard Osorio Mañanas
+ * Copyright 2014 Ricard Osorio Mañanas
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
  * TODO:
