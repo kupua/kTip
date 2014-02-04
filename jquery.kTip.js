@@ -1000,7 +1000,7 @@
 
 				case 'fade':
 					this.$content.hide();
-					this.$container.append(modalAnimationObj.$preContent)
+					this.$container.append(modalAnimationObj.$preContent);
 
 					if (browserSupportsCSSAnimations) {
 						this._applyCssAnimation(
@@ -1363,7 +1363,7 @@
 
 		setTimeout(function(){
 			$testDiv.remove();
-		}, 50);
+		}, 100);
 	});
 
 })(jQuery, window);
