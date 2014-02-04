@@ -97,7 +97,7 @@
 
 			// Appearance
 			css: {}, // Custom CSS
-			extraClass: (options && options.display) ? 'kT-'+options.display : 'kT-tooltip',
+			extraClass: (options && options.display) ? 'kT-' + options.display : 'kT-tooltip',
 			activeClass: 'active',
 			loadingClass: 'loading',
 			disabledClass: 'disabled',
@@ -869,7 +869,7 @@
 					.data('kTip', this) // Help detect children
 					.attr('class', 'kTip-overlay')
 					.css({
-						background: (browserSupportsCSSAnimations)
+						background: browserSupportsCSSAnimations
 							? 'rgba('
 								+ this.settings.overlayColorRGB.r + ', '
 								+ this.settings.overlayColorRGB.g + ', '
@@ -878,7 +878,7 @@
 							: this.settings.overlayColor,
 						height: '100%', // 100% doesn't work properly on touchscreens
 						left: 0,
-						opacity: (browserSupportsCSSAnimations) ? null : this.settings.overlayOpacity,
+						opacity: browserSupportsCSSAnimations ? null : this.settings.overlayOpacity,
 						position: 'fixed',
 						top: 0,
 						width: '100%', // 100% doesn't work properly on touchscreens
