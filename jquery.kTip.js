@@ -32,24 +32,13 @@
 	//---[ jQuery plugin ]----------------------------------------------------//
 
 	$.fn.kTip = function(defaultContent, options) {
-		var instance,
-		    count = 0;
-		this.each(function(){
-			if ($(this).data('kTip')) {
-				instance = $(this).data('kTip');
-			} else {
-				count++;
-				$(this).data('kTip', kTip(this, defaultContent, options));
+		return this.each(function(){
+			var $elem = $(this);
+
+			if (!$elem.data('kTip')) {
+				$elem.data('kTip', kTip(this, defaultContent, options));
 			}
 		});
-		// jQuery objects with only 1 element return either the instance or a
-		// jQuery chain. Multiple elements always return a jQuery chain.
-		// Eg:
-		//   $('#elem').kTip(); First call, returns jQuery
-		//   $('#elem').kTip(); Second call, returns kTip instance
-		//   $('.elements').kTip(); First call, returns jQuery
-		//   $('.elements').kTip(); Second call, returns jQuery
-		return (!instance || count > 1) ? this : instance;
 	};
 
 	$.expr[':'].kTip = function(elem) {
