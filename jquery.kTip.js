@@ -260,7 +260,7 @@
 			var allChildrenClosed = true;
 
 			this.$content.find(':kTip').each(function(){
-				if ($(this).kTip().isVisible()) {
+				if ($(this).data('kTip').isVisible()) {
 					allChildrenClosed = false;
 				}
 			});
@@ -405,7 +405,7 @@
 
 			// Close opened children
 			this.$content.find(':kTip').each(function(){
-				$(this).kTip().close();
+				$(this).data('kTip').close();
 			});
 		},
 
