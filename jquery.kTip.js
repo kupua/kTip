@@ -16,22 +16,11 @@
 
 	//---[ Browser utils ]----------------------------------------------------//
 
-	var browserVendorPrefixes = ' Webkit Moz O ms Khtml'.split(' ');
-
-	// Real value is calculated on document ready
+	// Browser scrollbar width (calculated on document ready)
 	var browserScrollbarWidth = 0;
 
-	// Based on https://hacks.mozilla.org/2011/09/detecting-and-generating-css-animations-in-javascript/
-	var browserSupportsCSSAnimations = function(){
-		var elem = document.createElement('div');
-
-		for (var i = 0; i < browserVendorPrefixes.length; i++) {
-			if (browserVendorPrefixes[i] + 'AnimationName' in elem.style) {
-				return true;
-			}
-		}
-		return false;
-	}();
+	// CSS3 animation support (calculated on document ready)
+	var browserSupportsCSSAnimations = false;
 
 	// Each browser listens to its own event
 	var animationEnd = 'animationend webkitAnimationEnd oanimationend MSAnimationEnd';
@@ -1365,9 +1354,12 @@
 		}
 	};
 
-	//---[ Browser scrollbar width ]------------------------------------------//
+	//---[ Document-ready checks ]--------------------------------------------//
 
 	$(function(){
+
+		//---[ Browser scrollbar width ]--------------------------------------//
+
 		var $testDiv = $('<div/>')
 			.css({
 				height: 100,
@@ -1380,6 +1372,22 @@
 		browserScrollbarWidth = $testDiv.innerWidth() - $testDiv.children().innerWidth();
 
 		$testDiv.remove();
+
+		//---[ CSS3 animation support ]---------------------------------------//
+
+		$testDiv = $('<div/>')
+			.appendTo('body')
+			.on(animationEnd, function(){
+				browserSupportsCSSAnimations = true;
+			})
+			.css({
+				animationDuration: '1ms',
+				animationName: 'kTip-fadeIn'
+			});
+
+		setTimeout(function(){
+			$testDiv.remove();
+		}, 50);
 	});
 
 })(jQuery, window);
