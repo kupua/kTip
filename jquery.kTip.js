@@ -6,18 +6,10 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *
  * TODO:
- *   - Test callbacks
  *   - Fit to mobile
  *   - Hide if trigger is hidden
- *   - Aware of z-index
- *   - Detect ajaxForm
- *   - Tooltip left/right to top/bottom on mobile
  *   - Cancel ajax requests on close (including file uploads), but don't call
  *     onFailedRequest? Or do?
- *   - Have separate overlays and be aware of z-indexes when using children
- *     (also ability to have 0 opacity modals over parent modals)
- *   - When two overlays are opened at the same time, the first one to close
- *     restores the body CSS, leaving 2 scrollbars
  */
 
 (function($, window, undefined){
