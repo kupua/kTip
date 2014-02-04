@@ -10,7 +10,7 @@ $unique_id = rand(0, 10000);
 
 <script>
 	var $infinite = $('#infinite-<?=$unique_id?>'),
-	    kTipInstance = $infinite.parents(':kTip').kTip(),
+	    kTipInstance = $infinite.parents(':kTip').data('kTip'),
 	    display = kTipInstance.settings.display,
 	    padding = <?=(int)@$_GET['padding']?> || 200;
 
