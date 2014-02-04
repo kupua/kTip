@@ -549,15 +549,10 @@
 
 			var self = this;
 
-			// File uploads don't work on IE. MUST FIX
 			if (this.settings.ajax.handleForms && $.fn.ajaxSubmit) {
 				this.$content.find('form').on('submit.kTip', function(e){
 					var $form = $(this);
 					e.preventDefault();
-					// if ($form.attr('enctype') == 'multipart/form-data' || $form.find('input[type="file"]').length) {
-					// 	alert("File uploads are discouraged in the current version of kTip. Please provide support through an external plugin.");
-					// 	return;
-					// }
 					self._lastSubmitName = $form.find(self.settings.submitIdentifier).val();
 					$form.ajaxSubmit($.extend(true, {}, self.settings.ajax, $form.data('kTip-ajax'), {
 						url: $form.attr('action') || self.settings.ajax.url || self.$trigger.attr('href'),
@@ -578,21 +573,6 @@
 					self.setLoadingState(); // After submit, as we are disabling all input fields
 				});
 			}
-
-			// this.$content.find('form').on('submit kTip_submit', function(e){
-			// 	e.preventDefault();
-			// 	var $elem = $(this);
-			// 	if (e.type == 'kTip_submit') {
-			// 		self.loadAjaxContent($elem, {type: 'move'}, 100);
-			// 	} else {
-			// 		// We wrap the call so other events are called first (we give
-			// 		// priority to form validation, custom submits, etc.)
-			// 		setTimeout(function(){
-			// 			if (!e.isPropagationStopped())
-			// 				$elem.trigger('kTip_submit');
-			// 		}, 100);
-			// 	}
-			// });
 
 			this.$content.find('[class*="kTip-redirect"]').on('click.kTip', function(e){
 				e.preventDefault();
@@ -629,21 +609,12 @@
 				.is(this.settings.ignoreClickSelector)
 		},
 
-		// abortCurrentAjaxRequest: function() {
-		// 	if (this._currentAjaxRequest) {
-		// 		this._currentAjaxRequest.abort();
-		// 		this._currentAjaxRequest = null;
-		// 	}
-		// },
-
 		redirect: function(url, modalAnimation) {
 			this.settings.ajax.url = url;
 			this.loadAjaxContent(url, modalAnimation);
 		},
 
 		loadAjaxContent: function(url, modalAnimation) {
-
-			// this.abortCurrentAjaxRequest();
 
 			var self = this;
 
@@ -654,7 +625,6 @@
 				type: 'GET',
 				url: url,
 				success: function(data){
-					// self._currentAjaxRequest = null;
 					self.disableLoadingState();
 					self.settings.onStopLoading.call(self);
 
@@ -666,13 +636,6 @@
 				},
 				error: function(jqXHR, textStatus, errorThrown){
 					self.settings.onFailedRequest.call(self, jqXHR, textStatus, errorThrown);
-					// self._currentAjaxRequest = null;
-
-					// if (textStatus !== 'abort') {
-					// 	self.$trigger.removeClass(self.settings.loadingClass);
-					// 	self.settings.onStopLoading.call(self);
-					// 	self.setContent('<div class="notice alert">S\'ha produït un error</div>', modalAnimation);
-					// }
 				}
 			}));
 		},
