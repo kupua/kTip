@@ -944,10 +944,7 @@
 						.show()
 						.appendTo('body');
 
-					this.$content.css({
-						//height: $tempContainer.find('.kTip-content').height()
-						width: $tempContainer.find('.kTip-content').width()
-					});
+					this.$content.outerWidth($tempContainer.find('.kTip-content').outerWidth());
 
 					$tempContainer.remove();
 				}
