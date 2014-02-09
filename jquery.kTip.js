@@ -418,11 +418,13 @@
 			var modalAnimationObj;
 
 			if (this.settings.display == 'modal') {
+				// We don't call height() or width() directly, as it gives problems
+				// when using box-sizing: border-box;
 				modalAnimationObj = {
 					type: modalAnimation,
 					$preContent: this.$content.clone(false),
-					preHeight: this.$content.height(),
-					preWidth: this.$content.width()
+					preHeight: this.$content.css('height'),
+					preWidth: this.$content.css('width')
 				};
 			}
 
@@ -911,8 +913,10 @@
 				};
 
 			if (!modalAnimationObj.preHeight || !modalAnimationObj.preWidth) {
-				modalAnimationObj.preHeight = this.$content.height();
-				modalAnimationObj.preWidth = this.$content.width();
+				// We don't call height() or width() directly, as it gives problems
+				// when using box-sizing: border-box;
+				modalAnimationObj.preHeight = this.$content.css('height');
+				modalAnimationObj.preWidth = this.$content.css('width');
 			}
 
 			//---[ Fix narrow blocks past body width ]------------------------//
@@ -950,8 +954,10 @@
 				}
 			}
 
-			modalAnimationObj.postHeight = this.$content.height();
-			modalAnimationObj.postWidth = this.$content.width();
+			// We don't call height() or width() directly, as it gives problems
+			// when using box-sizing: border-box;
+			modalAnimationObj.postHeight = this.$content.css('height');
+			modalAnimationObj.postWidth = this.$content.css('width');
 
 			//---[ Call depending on display ]--------------------------------//
 
