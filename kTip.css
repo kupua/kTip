@@ -10,12 +10,8 @@
 .kT-modal .kTip-content {
 	background-color: #fff;
 	border: 1px solid #999;
-	-webkit-border-radius: 2px;
-	   -moz-border-radius: 2px;
-	        border-radius: 2px;
-	-webkit-box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-	   -moz-box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-	        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+	border-radius: 2px;
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 	overflow: auto;
 	position: relative;
 }
@@ -24,12 +20,8 @@
 .kT-tooltip .kTip-content {
 	background-color: #fff;
 	border: 1px solid #999;
-	-webkit-border-radius: 2px;
-	   -moz-border-radius: 2px;
-	        border-radius: 2px;
-	-webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-	   -moz-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-	        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+	border-radius: 2px;
+	box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
 }
 
 .kT-tooltip .kTip-arrow-shadow {
@@ -39,44 +31,12 @@
 /*---[ Animations (daneden.me/animate) ]------------------------------------- */
 
 /* fadeIn */
-@-webkit-keyframes kTip-fadeIn {
-	  0% { opacity: 0; }
-	100% { opacity: 1; }
-}
-
-@-moz-keyframes kTip-fadeIn {
-	  0% { opacity: 0; }
-	100% { opacity: 1; }
-}
-
 @keyframes kTip-fadeIn {
 	  0% { opacity: 0; }
 	100% { opacity: 1; }
 }
 
 /* fadeInDown */
-@-webkit-keyframes kTip-fadeInDown {
-	0% {
-		opacity: 0;
-		-webkit-transform: translateY(-20px);
-	}
-	100% {
-		opacity: 1;
-		-webkit-transform: translateY(0);
-	}
-}
-
-@-moz-keyframes kTip-fadeInDown {
-	0% {
-		opacity: 0;
-		-moz-transform: translateY(-20px);
-	}
-	100% {
-		opacity: 1;
-		-moz-transform: translateY(0);
-	}
-}
-
 @keyframes kTip-fadeInDown {
 	0% {
 		opacity: 0;
@@ -89,44 +49,12 @@
 }
 
 /* fadeOut */
-@-webkit-keyframes kTip-fadeOut {
-	  0% { opacity: 1; }
-	100% { opacity: 0; }
-}
-
-@-moz-keyframes kTip-fadeOut {
-	  0% { opacity: 1; }
-	100% { opacity: 0; }
-}
-
 @keyframes kTip-fadeOut {
 	  0% { opacity: 1; }
 	100% { opacity: 0; }
 }
 
 /* fadeOutDown */
-@-webkit-keyframes kTip-fadeOutDown {
-	0% {
-		opacity: 1;
-		-webkit-transform: translateY(0);
-	}
-	100% {
-		opacity: 0;
-		-webkit-transform: translateY(20px);
-	}
-}
-
-@-moz-keyframes kTip-fadeOutDown {
-	0% {
-		opacity: 1;
-		-moz-transform: translateY(0);
-	}
-	100% {
-		opacity: 0;
-		-moz-transform: translateY(20px);
-	}
-}
-
 @keyframes kTip-fadeOutDown {
 	0% {
 		opacity: 1;
