@@ -559,7 +559,7 @@
 					$form.ajaxSubmit($.extend(true, {}, self.settings.ajax, $form.data('kTip-ajax'), {
 						url: $form.attr('action') || self.settings.ajax.url || self.$trigger.attr('href'),
 						success: function(data) {
-							self.disableLoadingState();
+							// self.disableLoadingState();
 							self.settings.onStopLoading.call(self);
 
 							if (typeof data == 'object') {
@@ -627,7 +627,7 @@
 				type: 'GET',
 				url: url,
 				success: function(data){
-					self.disableLoadingState();
+					// self.disableLoadingState();
 					self.settings.onStopLoading.call(self);
 
 					if (typeof data == 'object') {
