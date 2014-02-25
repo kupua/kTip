@@ -65,3 +65,29 @@
 		transform: translateY(20px);
 	}
 }
+
+/* flipIn */
+@keyframes kTip-flipIn {
+	0% {
+		transform: perspective(1000px) rotateX(-30deg);
+		opacity: 0;
+	}
+
+	100% {
+		transform: perspective(1000px) rotateX(0deg);
+		opacity: 1;
+	}
+}
+
+/* flipOut */
+@keyframes kTip-flipOut {
+	0% {
+		opacity: 1;
+		transform: perspective(1000px) rotateX(0deg);
+	}
+
+	100% {
+		opacity: 0;
+		transform: perspective(1000px) rotateX(-30deg);
+	}
+}
