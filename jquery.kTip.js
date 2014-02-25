@@ -559,7 +559,7 @@
 					$form.ajaxSubmit($.extend(true, {}, self.settings.ajax, $form.data('kTip-ajax'), {
 						url: $form.attr('action') || self.settings.ajax.url || self.$trigger.attr('href'),
 						success: function(data) {
-							// self.disableLoadingState();
+							self.disableLoadingState();
 							self.settings.onStopLoading.call(self);
 
 							if (typeof data == 'object') {
@@ -627,7 +627,7 @@
 				type: 'GET',
 				url: url,
 				success: function(data){
-					// self.disableLoadingState();
+					self.disableLoadingState();
 					self.settings.onStopLoading.call(self);
 
 					if (typeof data == 'object') {
@@ -658,7 +658,7 @@
 			}
 		},
 
-		disableLoadingState: function() {
+		disableLoadingState: function(enableDisabledInputs) {
 			if (this.$trigger) {
 				this.$trigger.removeClass(this.settings.loadingClass);
 			}
@@ -667,7 +667,7 @@
 				this.settings.tooltip.positionSource.removeClass(this.settings.loadingClass);
 			}
 
-			if (this.$content) {
+			if (this.$content && enableDisabledInputs) {
 				this.$content.find(':input').prop('disabled', false);
 				this.$content.find(':input, .kTip-loading-disabled').removeClass(this.settings.disabledClass);
 				this.$content.find('.kTip-loading').hide();
