@@ -1366,7 +1366,7 @@
 
 		setTimeout(function(){
 			$testDiv.remove();
-		}, 100);
+		}, 500);
 	});
 
 })(jQuery, window);
