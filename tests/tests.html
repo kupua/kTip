@@ -97,6 +97,7 @@
 				-webkit-transform: perspective(1000px) rotateX(-30deg);
 			}
 		}
+
 		body {
 			background-color: #eee;
 			font: 13px/1.5 arial, sans-serif;
@@ -283,9 +284,7 @@
 	// Infinite
 	test('.infinite', [
 		{
-			ajax: {
-				url: 'infinite.php'
-			}
+			ajaxUrl: 'infinite.php'
 		}
 	]);
 
@@ -324,11 +323,9 @@
 	// Ajax form
 	test('.ajax-form', [
 		{
-			ajax: {
-				url: 'form.php',
-				data: {
-					ajax: 'true'
-				}
+			ajaxUrl: 'form.php',
+			ajaxData: {
+				ajax: 'true'
 			}
 		}
 	]);
@@ -336,18 +333,14 @@
 	// File upload
 	test('.file-upload', [
 		{
-			ajax: {
-				url: 'file-upload.php'
-			}
+			ajaxUrl: 'file-upload.php'
 		}
 	]);
 
 	// Redirect
 	test('.redirect', [
 		{
-			ajax: {
-				url: 'redirect-a.html'
-			}
+			ajaxUrl: 'redirect-a.html'
 		}
 	]);
 

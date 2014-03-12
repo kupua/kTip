@@ -61,7 +61,7 @@
 			trigger = null;
 		}
 
-		// No defaultContent is required, as long as settings.ajax.url is set
+		// No defaultContent is required, as long as settings.ajaxUrl is set
 		// or an href attribute is provided
 		if (typeof defaultContent == 'object') {
 			options = defaultContent;
@@ -90,17 +90,12 @@
 			activeClass: 'active',
 			loadingClass: 'loading',
 			disabledClass: 'disabled',
-			showDelay: (options && options.tooltip && options.tooltip.bind == 'hover') ? 200 : 0, // Show delay in ms
-			hideDelay: (options && options.tooltip && options.tooltip.bind == 'hover') ? 200 : 0, // Hide delay in ms
+			showDelay: (options && options.tooltipBind == 'hover') ? 200 : 0, // Show delay in ms
+			hideDelay: (options && options.tooltipBind == 'hover') ? 200 : 0, // Hide delay in ms
 			showAnimation: 'kTip-fadeInDown',
 			showSpeed: 300,
 			hideAnimation: 'kTip-fadeOutDown',
 			hideSpeed: 300,
-			overlay: (options && options.display == 'modal') ? true : false,
-			overlayColor: '#fff',
-			overlayOpacity: 0.7, // Opacity from 0 to 1
-			overlayShowSpeed: 300,
-			overlayHideSpeed: 300,
 			submitIdentifier: 'input[type="submit"]',
 			ignoreClickSelector: '.kTip-ignore-click',
 			focusPriority: [
@@ -111,28 +106,29 @@
 			breatheSeparation: (options && options.display == 'modal') ? 30 : 0,
 
 			// Ajax built-in functionality
-			ajax: {
-				url: undefined, // URL to fetch data from (if no defaultContent is provided or a form is sent)
-				data: {}, // Additional arguments to be sent
-				handleForms: true // Depends on the existence of the jQuery Form Plugin (https://github.com/malsup/form)
-			},
+			ajaxUrl: undefined, // URL to fetch data from (if no defaultContent is provided or a form is sent)
+			ajaxData: {}, // Additional arguments to be sent
+			handleForms: true, // Depends on the existence of the jQuery Form Plugin (https://github.com/malsup/form)
+
+			// Overlay settings
+			overlay: (options && options.display == 'modal') ? true : false,
+			overlayColor: '#fff',
+			overlayOpacity: 0.7, // Opacity from 0 to 1
+			overlayShowSpeed: 300,
+			overlayHideSpeed: 300,
 
 			// Modal settings
-			modal: {
-				animateSpeed: 500
-			},
+			modalAnimateSpeed: 500,
 
 			// Tooltip settings
-			tooltip: {
-				bind: 'click', // click, hover or focus
-				position: 'top center', // top/bottom left/center/right, or left/right top/middle/bottom
-				positionSource: $(trigger),
-				distance: 0,
-				arrowSize: 8, // Arrow size in pixels
-				arrowDistance: 15,
-				arrowFrontColor: undefined,
-				fit: true
-			},
+			tooltipBind: 'click', // click, hover or focus
+			tooltipPosition: 'top center', // top/bottom left/center/right, or left/right top/middle/bottom
+			tooltipPositionSource: $(trigger),
+			tooltipDistance: 0,
+			tooltipArrowSize: 8, // Arrow size in pixels
+			tooltipArrowDistance: 15,
+			tooltipArrowFrontColor: undefined,
+			tooltipFit: true,
 
 			// Callbacks
 			onCreateElements: function(){},
@@ -156,7 +152,7 @@
 		$.extend(true, this.settings, options);
 
 		// Help detect children
-		this.settings.tooltip.positionSource.data('kTip', this);
+		this.settings.tooltipPositionSource.data('kTip', this);
 
 		// Convert overlay color from hex to rgb (http://stackoverflow.com/a/5624139)
 		this.settings.overlayColorRGB = function(hex) {
@@ -183,7 +179,7 @@
 
 		// Private vars
 		this._defaultContent = defaultContent;
-		this._defaultAjaxUrl = this.settings.ajax.url;
+		this._defaultAjaxUrl = this.settings.ajaxUrl;
 		this._lastSubmitName = null;
 		this._show = false;
 		this._triggerZIndexBackup = null;
@@ -207,7 +203,7 @@
 					break;
 
 				case 'tooltip':
-					switch (this.settings.tooltip.bind) {
+					switch (this.settings.tooltipBind) {
 						case 'click':
 							this.$trigger.on('click.kTip', function(e){
 								self.isVisible() ? self.close() : self.open(self.settings.showDelay);
@@ -304,10 +300,10 @@
 
 			// New content
 			if (this.settings.renew || !this.$container) {
-				this.settings.ajax.url = this._defaultAjaxUrl;
+				this.settings.ajaxUrl = this._defaultAjaxUrl;
 				this._lastSubmitName = null;
 
-				var url = this.settings.ajax.url || this.$trigger.attr('href');
+				var url = this.settings.ajaxUrl || this.$trigger.attr('href');
 
 				if (this._defaultContent) {
 					this.setContent(this._defaultContent);
@@ -318,7 +314,7 @@
 						this.loadAjaxContent(url);
 					}
 				} else {
-					throw "kTip: no defaultContent or settings.ajax.url provided.";
+					throw "kTip: no defaultContent or settings.ajaxUrl provided.";
 				}
 			}
 			// Show existing content
@@ -344,7 +340,7 @@
 
 			// this.abortCurrentAjaxRequest();
 			this.$trigger
-				.add(this.settings.tooltip.positionSource)
+				.add(this.settings.tooltipPositionSource)
 					.removeClass(this.settings.loadingClass)
 					.removeClass(this.settings.activeClass);
 
@@ -551,13 +547,14 @@
 
 			var self = this;
 
-			if (this.settings.ajax.handleForms && $.fn.ajaxSubmit) {
+			if (this.settings.handleForms && $.fn.ajaxSubmit) {
 				this.$content.find('form').on('submit.kTip', function(e){
 					var $form = $(this);
 					e.preventDefault();
 					self._lastSubmitName = $form.find(self.settings.submitIdentifier).val();
-					$form.ajaxSubmit($.extend(true, {}, self.settings.ajax, $form.data('kTip-ajax'), {
-						url: $form.attr('action') || self.settings.ajax.url || self.$trigger.attr('href'),
+					$form.ajaxSubmit($.extend(true, {}, $form.data('kTip-ajax'), {
+						url: $form.attr('action') || self.settings.ajaxUrl || self.$trigger.attr('href'),
+						data: self.settings.ajaxData,
 						success: function(data) {
 							self.disableLoadingState();
 							self.settings.onStopLoading.call(self);
@@ -612,7 +609,7 @@
 		},
 
 		redirect: function(url, modalAnimation) {
-			this.settings.ajax.url = url;
+			this.settings.ajaxUrl = url;
 			this.loadAjaxContent(url, modalAnimation);
 		},
 
@@ -623,9 +620,10 @@
 			this.setLoadingState();
 			this.settings.onStartLoading.call(this);
 
-			$.ajax($.extend(true, {}, self.settings.ajax, {
+			$.ajax($.extend(true, {}, {
 				type: 'GET',
 				url: url,
+				data: this.settings.ajaxData,
 				success: function(data){
 					self.disableLoadingState();
 					self.settings.onStopLoading.call(self);
@@ -647,8 +645,8 @@
 				this.$trigger.addClass(this.settings.loadingClass);
 			}
 
-			if (this.settings.tooltip.positionSource) {
-				this.settings.tooltip.positionSource.addClass(this.settings.loadingClass);
+			if (this.settings.tooltipPositionSource) {
+				this.settings.tooltipPositionSource.addClass(this.settings.loadingClass);
 			}
 
 			if (this.$content) {
@@ -663,8 +661,8 @@
 				this.$trigger.removeClass(this.settings.loadingClass);
 			}
 
-			if (this.settings.tooltip.positionSource) {
-				this.settings.tooltip.positionSource.removeClass(this.settings.loadingClass);
+			if (this.settings.tooltipPositionSource) {
+				this.settings.tooltipPositionSource.removeClass(this.settings.loadingClass);
 			}
 
 			if (this.$content && enableDisabledInputs) {
@@ -743,7 +741,7 @@
 					.css(this.settings.css)
 					.appendTo(this.$container);
 
-				if (this.settings.tooltip.bind == 'hover') {
+				if (this.settings.tooltipBind == 'hover') {
 					this.$container.on('mouseenter.kTip', function(){self.open(self.settings.showDelay)});
 					this.$container.on('mouseleave.kTip', function(){self.close(self.settings.hideDelay)});
 				}
@@ -843,7 +841,7 @@
 					                    // (that would otherwise be hidden by the overlay)
 			}
 
-			if (!this.$tooltipArrow && this.settings.display == 'tooltip' && this.settings.tooltip.arrowSize) {
+			if (!this.$tooltipArrow && this.settings.display == 'tooltip' && this.settings.tooltipArrowSize) {
 				this.$tooltipArrow = $('<div/>')
 					.addClass('kTip-arrow')
 					.css({
@@ -854,15 +852,15 @@
 						.addClass('kTip-arrow-shadow')
 						.css({
 							borderStyle: 'solid',
-							borderWidth: this.settings.tooltip.arrowSize
+							borderWidth: this.settings.tooltipArrowSize
 						})
 					)
 					.append($('<div/>')
 						.addClass('kTip-arrow-front')
 						.css({
-							borderColor: this.settings.tooltip.arrowFrontColor || this.$content.css('background-color'),
+							borderColor: this.settings.tooltipArrowFrontColor || this.$content.css('background-color'),
 							borderStyle: 'solid',
-							borderWidth: this.settings.tooltip.arrowSize,
+							borderWidth: this.settings.tooltipArrowSize,
 							position: 'absolute'
 						}
 					));
@@ -1009,7 +1007,7 @@
 						this._applyCssAnimation(
 							this.$container,
 							'kTip-fadeOutDown',
-							this.settings.modal.animateSpeed,
+							this.settings.modalAnimateSpeed,
 							function(){
 								modalAnimationObj.$preContent.remove();
 								self.$content.show();
@@ -1020,7 +1018,7 @@
 								self._applyCssAnimation(
 									self.$container,
 									'kTip-fadeInDown',
-									self.settings.modal.animateSpeed,
+									self.settings.modalAnimateSpeed,
 									function(){
 										self.setFocus();
 									}
@@ -1029,13 +1027,13 @@
 						);
 					} else {
 						this.$container
-							.fadeOut(this.settings.modal.animateSpeed, function(){
+							.fadeOut(this.settings.modalAnimateSpeed, function(){
 								modalAnimationObj.$preContent.remove();
 								self.$content.show();
 								self.$container.css({
 									top: top,
 									left: left
-								}).fadeIn(self.settings.modal.animateSpeed, function(){
+								}).fadeIn(self.settings.modalAnimateSpeed, function(){
 									self.setFocus();
 								});
 							});
@@ -1047,7 +1045,7 @@
 						top: top,
 						left: left,
 						opacity: 1
-					}, this.settings.modal.animateSpeed);
+					}, this.settings.modalAnimateSpeed);
 					break;
 
 				case 'instant':
@@ -1066,14 +1064,14 @@
 					}).animate({
 						height: modalAnimationObj.postHeight,
 						width: modalAnimationObj.postWidth
-					}, this.settings.modal.animateSpeed, function(){
+					}, this.settings.modalAnimateSpeed, function(){
 						self.$content.css('height', self.settings.css.height || '');
 					});
 					this.$container.stop().animate({
 						top: top,
 						left: left,
 						opacity: 1
-					}, this.settings.modal.animateSpeed);
+					}, this.settings.modalAnimateSpeed);
 					break;
 			}
 		},
@@ -1088,26 +1086,26 @@
 					position: undefined
 				},
 			    breatheSeparation = this.settings.breatheSeparation
-			                      + this.settings.tooltip.arrowSize,
+			                      + this.settings.tooltipArrowSize,
 			    windowHeight = $(window).height(),
 			    windowWidth = $(window).width(),
 			    containerHeight = this.$container.outerHeight(true),
 			    containerWidth = this.$container.outerWidth(true),
-			    $source = this.settings.tooltip.positionSource,
+			    $source = this.settings.tooltipPositionSource,
 			    sourceOffset = $source.offset(),
 			    sourceHeight = $source.outerHeight(),
 			    sourceWidth = $source.outerWidth(),
-			    distance = this.settings.tooltip.distance,
-			    arrowSize = this.settings.tooltip.arrowSize,
-			    arrowDistance = this.settings.tooltip.arrowDistance,
+			    distance = this.settings.tooltipDistance,
+			    arrowSize = this.settings.tooltipArrowSize,
+			    arrowDistance = this.settings.tooltipArrowDistance,
 			    scrollTop = $(document).scrollTop(),
 			    scrollLeft = $(document).scrollLeft(),
-			    position = this.settings.tooltip.position.split(' ')[0],
-			    modifier = this.settings.tooltip.position.split(' ')[1];
+			    position = this.settings.tooltipPosition.split(' ')[0],
+			    modifier = this.settings.tooltipPosition.split(' ')[1];
 
 			//---[ Fit in window 1 ]------------------------------------------//
 
-			if (this.settings.tooltip.fit) {
+			if (this.settings.tooltipFit) {
 
 				if (position == 'bottom' && windowHeight < (sourceOffset.top - scrollTop + sourceHeight + containerHeight + breatheSeparation)) {
 					position = 'top';
@@ -1168,7 +1166,7 @@
 
 			//---[ Fit in window 2 ]------------------------------------------//
 
-			if (this.settings.tooltip.fit) {
+			if (this.settings.tooltipFit) {
 
 				var move, posFit;
 

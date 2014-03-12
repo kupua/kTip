@@ -19,10 +19,8 @@ $unique_id = rand(0, 10000);
 		$infinite.kTip({
 			display: display,
 			overlay: false,
-			ajax: {
-				data: {
-					padding: padding -5
-				}
+			ajaxData: {
+				padding: padding -5
 			},
 			css: {
 				padding: padding + 'px ' + padding + 'px ' + (padding - 10) + 'px'
