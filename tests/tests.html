@@ -36,6 +36,67 @@
 			animation: none !important;
 		}
 
+		/* fadeIn */
+		@-webkit-keyframes kTip-fadeIn {
+			  0% { opacity: 0; }
+			100% { opacity: 1; }
+		}
+
+		/* fadeInDown */
+		@-webkit-keyframes kTip-fadeInDown {
+			0% {
+				opacity: 0;
+				-webkit-transform: translateY(-20px);
+			}
+			100% {
+				opacity: 1;
+				-webkit-transform: translateY(0);
+			}
+		}
+
+		/* fadeOut */
+		@-webkit-keyframes kTip-fadeOut {
+			  0% { opacity: 1; }
+			100% { opacity: 0; }
+		}
+
+		/* fadeOutDown */
+		@-webkit-keyframes kTip-fadeOutDown {
+			0% {
+				opacity: 1;
+				-webkit-transform: translateY(0);
+			}
+			100% {
+				opacity: 0;
+				-webkit-transform: translateY(20px);
+			}
+		}
+
+		/* flipIn */
+		@-webkit-keyframes kTip-flipIn {
+			0% {
+				-webkit-transform: perspective(1000px) rotateX(-30deg);
+				opacity: 0;
+			}
+
+			100% {
+				-webkit-transform: perspective(1000px) rotateX(0deg);
+				opacity: 1;
+			}
+		}
+
+		/* flipOut */
+		@-webkit-keyframes kTip-flipOut {
+			0% {
+				opacity: 1;
+				-webkit-transform: perspective(1000px) rotateX(0deg);
+			}
+
+			100% {
+				opacity: 0;
+				-webkit-transform: perspective(1000px) rotateX(-30deg);
+			}
+		}
 		body {
 			background-color: #eee;
 			font: 13px/1.5 arial, sans-serif;
