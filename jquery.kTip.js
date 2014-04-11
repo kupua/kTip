@@ -650,7 +650,7 @@
 			}
 
 			if (this.$container) {
-				this.$content.addClass(this.settings.loadingClass);
+				this.$container.addClass(this.settings.loadingClass);
 			}
 
 			if (this.$content) {
@@ -670,7 +670,7 @@
 			}
 
 			if (this.$container) {
-				this.$content.removeClass(this.settings.loadingClass);
+				this.$container.removeClass(this.settings.loadingClass);
 			}
 
 			if (this.$content && enableDisabledInputs) {
