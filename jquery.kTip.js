@@ -556,7 +556,7 @@
 						url: $form.attr('action') || self.settings.ajaxUrl || self.$trigger.attr('href'),
 						data: self.settings.ajaxData,
 						success: function(data) {
-							self.disableLoadingState($form);
+							self.disableLoadingState();
 							self.settings.onStopLoading.call(self);
 
 							if (typeof data == 'object') {
@@ -569,7 +569,7 @@
 							self.settings.onFailedRequest.call(self, jqXHR, textStatus, errorThrown);
 						}
 					}));
-					self.setLoadingState($form); // After submit, as we are disabling all input fields
+					self.setLoadingState(); // After submit, as we are disabling all input fields
 				});
 			}
 
@@ -640,7 +640,7 @@
 			}));
 		},
 
-		setLoadingState: function($extraElements) {
+		setLoadingState: function() {
 			if (this.$trigger) {
 				this.$trigger.addClass(this.settings.loadingClass);
 			}
@@ -649,18 +649,18 @@
 				this.settings.tooltipPositionSource.addClass(this.settings.loadingClass);
 			}
 
+			if (this.$container) {
+				this.$content.addClass(this.settings.loadingClass);
+			}
+
 			if (this.$content) {
 				this.$content.find(':input').prop('disabled', true);
 				this.$content.find(':input, .kTip-loading-disabled').addClass(this.settings.disabledClass);
 				this.$content.find('.kTip-loading').show();
 			}
-
-			if ($extraElements) {
-				$extraElements.addClass(this.settings.loadingClass);
-			}
 		},
 
-		disableLoadingState: function($extraElements, enableDisabledInputs) {
+		disableLoadingState: function(enableDisabledInputs) {
 			if (this.$trigger) {
 				this.$trigger.removeClass(this.settings.loadingClass);
 			}
@@ -669,14 +669,14 @@
 				this.settings.tooltipPositionSource.removeClass(this.settings.loadingClass);
 			}
 
+			if (this.$container) {
+				this.$content.removeClass(this.settings.loadingClass);
+			}
+
 			if (this.$content && enableDisabledInputs) {
 				this.$content.find(':input').prop('disabled', false);
 				this.$content.find(':input, .kTip-loading-disabled').removeClass(this.settings.disabledClass);
 				this.$content.find('.kTip-loading').hide();
-			}
-
-			if ($extraElements) {
-				$extraElements.removeClass(this.settings.loadingClass);
 			}
 		},
 
