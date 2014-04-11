@@ -660,7 +660,7 @@
 			}
 		},
 
-		disableLoadingState: function($extraElements) {
+		disableLoadingState: function($extraElements, enableDisabledInputs) {
 			if (this.$trigger) {
 				this.$trigger.removeClass(this.settings.loadingClass);
 			}
