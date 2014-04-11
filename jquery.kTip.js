@@ -556,7 +556,7 @@
 						url: $form.attr('action') || self.settings.ajaxUrl || self.$trigger.attr('href'),
 						data: self.settings.ajaxData,
 						success: function(data) {
-							self.disableLoadingState();
+							self.disableLoadingState($form);
 							self.settings.onStopLoading.call(self);
 
 							if (typeof data == 'object') {
@@ -569,7 +569,7 @@
 							self.settings.onFailedRequest.call(self, jqXHR, textStatus, errorThrown);
 						}
 					}));
-					self.setLoadingState(); // After submit, as we are disabling all input fields
+					self.setLoadingState($form); // After submit, as we are disabling all input fields
 				});
 			}
 
@@ -640,7 +640,7 @@
 			}));
 		},
 
-		setLoadingState: function() {
+		setLoadingState: function($extraElements) {
 			if (this.$trigger) {
 				this.$trigger.addClass(this.settings.loadingClass);
 			}
@@ -654,9 +654,13 @@
 				this.$content.find(':input, .kTip-loading-disabled').addClass(this.settings.disabledClass);
 				this.$content.find('.kTip-loading').show();
 			}
+
+			if ($extraElements) {
+				$extraElements.addClass(this.settings.loadingClass);
+			}
 		},
 
-		disableLoadingState: function(enableDisabledInputs) {
+		disableLoadingState: function($extraElements) {
 			if (this.$trigger) {
 				this.$trigger.removeClass(this.settings.loadingClass);
 			}
@@ -669,6 +673,10 @@
 				this.$content.find(':input').prop('disabled', false);
 				this.$content.find(':input, .kTip-loading-disabled').removeClass(this.settings.disabledClass);
 				this.$content.find('.kTip-loading').hide();
+			}
+
+			if ($extraElements) {
+				$extraElements.removeClass(this.settings.loadingClass);
 			}
 		},
 
