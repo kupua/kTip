@@ -1372,7 +1372,7 @@
 
 		setTimeout(function(){
 			$testDiv.remove();
-		}, 500);
+		}, 2000);
 	});
 
 })(jQuery, window);
